@@ -2548,6 +2548,37 @@ EOF
   printf '%s %s' "$tab_id" "$pane_id"
 }
 
+# fm_backend_herdr_name_agent_best_effort: give the agent in <target> the
+# recognisable display name crew-<task-id>, so Herdr's agent panel can tell
+# this worker apart from its supervisor and from every other worker instead of
+# listing them all under the harness name.
+#
+# The name is presentation only - endpoint identity stays the recorded
+# session/workspace/tab/pane - so this always returns success: an unparseable
+# target, a refused rename, or an agent that never registers leaves the
+# harness label in place behind one warning rather than failing the spawn.
+#
+# The name alphabet and the registration delay are verified facts owned by
+# docs/verification/runtime-backends.md "Herdr": a name must start with a
+# lowercase letter, hold only lowercase letters, digits, '-' and '_', and stay
+# within 32 characters, and no agent exists to rename until about a second
+# after its launch line runs. Hence the fold to that alphabet under the
+# constant crew- prefix, the truncation to the remaining 27, and the bounded
+# settle retry.
+fm_backend_herdr_name_agent_best_effort() {  # <target> <task-id>
+  local target=$1 task_id=$2 name attempt=0 max_attempts=${FM_BACKEND_HERDR_AGENT_NAME_POLLS:-20}
+  name=crew-$(printf '%s' "$task_id" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9_-' '-' | cut -c 1-27)
+  if fm_backend_herdr_parse_target "$target"; then
+    while :; do
+      fm_backend_herdr_cli "$FM_BACKEND_HERDR_SESSION" agent rename "$FM_BACKEND_HERDR_PANE" "$name" >/dev/null 2>&1 && return 0
+      attempt=$((attempt + 1))
+      [ "$attempt" -lt "$max_attempts" ] || break
+      sleep 0.25
+    done
+  fi
+  echo "warning: herdr did not accept the name '$name' for this worker's agent; it stays under its harness label in the agent panel" >&2
+}
+
 # fm_backend_herdr_projection_create_task: create one disposable presentation
 # workspace and its normal fm-<id> task tab without looking up, adopting, or
 # reusing any existing workspace.

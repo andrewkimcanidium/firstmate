@@ -3696,6 +3696,48 @@ test_normalize_key() {
   pass "fm_backend_herdr_normalize_key: Enter/Escape/C-c map to herdr's verified enter/escape/ctrl+c"
 }
 
+# --- agent naming: the presentation-only crew-<task-id> label ----------------
+
+test_name_agent_sanitizes_and_truncates_the_task_id() {
+  local dir log resp fb
+  dir="$TMP_ROOT/name-agent"; mkdir -p "$dir/responses"; log="$dir/log"; resp="$dir/responses"; : > "$log"
+  fb=$(make_herdr_fakebin "$dir")
+  PATH="$fb:$PATH" FM_HERDR_LOG="$log" FM_HERDR_RESPONSES="$resp" \
+    bash -c '. "$0/bin/backends/herdr.sh"; fm_backend_herdr_name_agent_best_effort default:w1:p2 "FM-Name/Herdr.Agents-With-A-Very-Long-Tail"' "$ROOT"
+  assert_contains "$(cat "$log")" "HERDR_SESSION=default"$'\x1f''agent'$'\x1f''rename'$'\x1f''w1:p2'$'\x1f''crew-fm-name-herdr-agents-with-a'$'\x1f''--session' \
+    "the rename did not fold the task id to herdr's lowercase alphabet and truncate it to the 32-character limit"
+  pass "fm_backend_herdr_name_agent_best_effort: renames the agent to crew-<task-id> folded to herdr's accepted name alphabet and length"
+}
+
+test_name_agent_retries_until_the_agent_registers() {
+  local dir log resp fb
+  dir="$TMP_ROOT/name-agent-retry"; mkdir -p "$dir/responses"; log="$dir/log"; resp="$dir/responses"; : > "$log"
+  # Herdr refuses with agent_not_found until the launched harness process is
+  # registered, a beat after the launch line runs.
+  printf '1\n' > "$resp/1.exit"
+  fb=$(make_herdr_fakebin "$dir")
+  PATH="$fb:$PATH" FM_HERDR_LOG="$log" FM_HERDR_RESPONSES="$resp" \
+    bash -c '. "$0/bin/backends/herdr.sh"; fm_backend_herdr_name_agent_best_effort default:w1:p2 crew-id' "$ROOT" 2>/dev/null
+  [ "$(grep -c "$(printf 'agent\x1frename')" "$log")" = 2 ] ||
+    fail "the rename should be retried once the first attempt finds no registered agent, got $(grep -c "$(printf 'agent\x1frename')" "$log") attempts"
+  pass "fm_backend_herdr_name_agent_best_effort: retries the rename until herdr has registered the launched agent"
+}
+
+test_name_agent_never_fails_the_spawn() {
+  local dir log resp fb out status
+  dir="$TMP_ROOT/name-agent-refused"; mkdir -p "$dir/responses"; log="$dir/log"; resp="$dir/responses"; : > "$log"
+  printf '1\n' > "$resp/1.exit"
+  printf '1\n' > "$resp/2.exit"
+  fb=$(make_herdr_fakebin "$dir")
+  out=$( PATH="$fb:$PATH" FM_HERDR_LOG="$log" FM_HERDR_RESPONSES="$resp" FM_BACKEND_HERDR_AGENT_NAME_POLLS=2 \
+    bash -c '. "$0/bin/backends/herdr.sh"; fm_backend_herdr_name_agent_best_effort default:w1:p2 crew-id' "$ROOT" 2>&1 )
+  status=$?
+  [ "$status" = 0 ] || fail "a refused presentation rename must not fail its spawn, got status $status"
+  assert_contains "$out" "warning: herdr did not accept the name" \
+    "a refused rename should leave a warning naming the label the worker keeps"
+  pass "fm_backend_herdr_name_agent_best_effort: a rename herdr keeps refusing warns and still succeeds"
+}
+
 # --- capture / send_key / kill / current_path --------------------------------
 
 test_capture_calls_pane_read() {
@@ -5874,6 +5916,9 @@ test_workspace_find_matches_only_this_homes_own_label
 test_list_live_scoped_to_this_homes_workspace_only
 test_parse_target
 test_normalize_key
+test_name_agent_sanitizes_and_truncates_the_task_id
+test_name_agent_retries_until_the_agent_registers
+test_name_agent_never_fails_the_spawn
 test_capture_calls_pane_read
 test_capture_works_around_small_lines_bug
 test_capture_preserves_pane_read_failure

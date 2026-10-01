@@ -111,6 +111,11 @@ A secondmate launched by the primary receives a narrowly scoped home override du
 Attach to the selected named Herdr session and switch to the relevant home workspace to watch its task tabs.
 Routine supervision uses `bin/fm-peek.sh <id>` and `FM_HOME=<home> bin/fm-send.sh <id> '<text>'` without attaching.
 
+### Agent names
+
+Every worker's agent is renamed to `crew-<task-id>` once its harness registers, so Herdr's agent panel separates workers from their supervisor and from each other instead of listing them all under the harness name.
+The name is presentation only: endpoint identity stays the recorded session, workspace, tab, and pane, and a rename Herdr refuses leaves the harness label in place behind a warning rather than failing the spawn.
+
 ### Focus
 
 Workspace and tab creation use `--no-focus`.

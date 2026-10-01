@@ -5340,6 +5340,14 @@ if [ "${HERDR_PROJECTED:-0}" -eq 1 ]; then
   spawn_herdr_presentation_order_lock_release
 fi
 spawn_send_key "$T" Enter
+# Presentation only, and only once the launch line is running: herdr registers
+# an agent for the pane a beat after its harness process starts, and names it
+# after the harness, so every worker and its supervisor read as the same entry
+# in the agent panel until this renames them apart. The helper owns the name
+# rules and never fails the spawn.
+if [ "$BACKEND" = herdr ]; then
+  fm_backend_herdr_name_agent_best_effort "$T" "$ID"
+fi
 if [ "$HARNESS" = kimi ]; then
   if ! kimi_wait_for_ready; then
     kimi_spawn_fail "$KIMI_READY_FAILURE_DETAIL"
