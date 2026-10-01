@@ -5335,9 +5335,12 @@ sleep 0.3
 SPAWN_LAUNCH_SENT=1
 # Read before the launch line so the agent naming below can tell this spawn's
 # registration from whatever the adopted pane already carried: a fresh pane
-# reads empty, a --relaunch may still read its predecessor.
+# reads empty, a --relaunch may still read its predecessor. A non-empty
+# RESUME_ARGS means this launch resumes onto the identity the pane already
+# reports, so the registration there IS this spawn's agent and there is nothing
+# to tell apart; leaving the capture empty names it as soon as it is readable.
 HERDR_PRELAUNCH_AGENT_REF=
-if [ "$BACKEND" = herdr ] && fm_backend_herdr_parse_target "$T"; then
+if [ "$BACKEND" = herdr ] && [ -z "$RESUME_ARGS" ] && fm_backend_herdr_parse_target "$T"; then
   HERDR_PRELAUNCH_AGENT_REF=$(fm_backend_herdr_pane_agent_session_ref \
     "$FM_BACKEND_HERDR_SESSION" "$FM_BACKEND_HERDR_PANE") || HERDR_PRELAUNCH_AGENT_REF=
 fi
@@ -5352,8 +5355,8 @@ spawn_send_key "$T" Enter
 # an agent for the pane a beat after its harness process starts, and names it
 # after the harness, so every worker and its supervisor read as the same entry
 # in the agent panel until this renames them apart. The helper owns the name
-# rules, waits for a registration newer than the pre-launch one, and never
-# fails the spawn.
+# rules, waits for a registration newer than the pre-launch one when there is a
+# predecessor to tell it from, and never fails the spawn.
 if [ "$BACKEND" = herdr ]; then
   fm_backend_herdr_name_agent_best_effort "$T" "$ID" "$HERDR_PRELAUNCH_AGENT_REF"
 fi

@@ -113,14 +113,18 @@ Routine supervision uses `bin/fm-peek.sh <id>` and `FM_HOME=<home> bin/fm-send.s
 
 ### Agent names
 
-Every worker's agent is renamed to `crew-<head>-<digest>` once its harness registers, so Herdr's agent panel separates workers from their supervisor and from each other instead of listing them all under the harness name.
+Every worker's agent is renamed to `crew-<head>-<digest>` once the spawn can tell this incarnation's registration from whatever the pane carried before it, so Herdr's agent panel separates workers from their supervisor and from each other instead of listing them all under the harness name.
 Herdr accepts a name of at most 32 characters that starts with a lowercase letter and holds only lowercase letters, digits, `-` and `_`, so the task id is lowercased, every other character is folded to `-`, and the result is cut to an 18-character readable `<head>`; `<digest>` is the eight-hex-digit `cksum` of the WHOLE task id, so two ids that share a head still name their panes apart.
 The name is presentation only: endpoint identity stays the recorded session, workspace, tab, and pane, the rename writes only the agent's `name` field and never the harness label the adapter branches on, and a rename Herdr refuses silently leaves that harness label in place rather than failing the spawn.
 
 The spawn reads the pane's agent session reference BEFORE sending the launch line and renames only once the pane reports a reference that is non-empty and different from that one, within a bounded poll budget.
-A fresh spawn owns a brand-new pane, reads nothing, and is named by its first registration.
-A `--relaunch` adopts the recorded pane, which may still carry the predecessor's registration, and that anchor is what stops the name landing on the predecessor and leaving the successor - which registers about a second later - under its bare harness label.
-A successor that never registers inside the budget keeps the harness label silently.
+That read is taken only when the launch does NOT resume onto the identity the pane already reports, which splits the three cases:
+
+- A fresh spawn owns a brand-new pane, so nothing is registered, the read is empty either way, and the first registration is named.
+- A `--relaunch` onto a fresh session adopts the recorded pane, which may still carry the predecessor's registration; the captured reference is what stops the name landing on that predecessor and leaving the successor - which registers about a second later - under its bare harness label.
+- A `--relaunch` that resumes the recorded identity (the Pi-family `--session` continuity above) deliberately re-registers the successor on the SAME reference, so there is no change to wait for; nothing is captured and the registration on the pane is named as soon as it reads.
+
+A registration that never becomes nameable inside the budget keeps the harness label silently.
 
 ### Focus
 

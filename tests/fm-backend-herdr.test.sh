@@ -3797,6 +3797,26 @@ test_name_agent_waits_for_the_successor_on_relaunch() {
   pass "fm_backend_herdr_name_agent_best_effort: a relaunch names the successor, never the predecessor's lingering registration"
 }
 
+test_name_agent_names_a_resumed_registration_on_the_first_attempt() {
+  local dir log resp fb calls renamed
+  # A Pi-family --relaunch resumes the recorded identity, so the successor
+  # re-registers on the SAME reference the pane already reports and there is no
+  # change to wait for. bin/fm-spawn.sh captures nothing in that case, and an
+  # empty capture must name whatever registration is readable right away.
+  dir="$TMP_ROOT/name-agent-resume"; mkdir -p "$dir/responses"; log="$dir/log"; resp="$dir/responses"; : > "$log"
+  herdr_agent_get_body e79f82b9-922b-43cc-990f-e78078f1d96d > "$resp/1.out"
+  fb=$(make_herdr_fakebin "$dir")
+  PATH="$fb:$PATH" FM_HERDR_LOG="$log" FM_HERDR_RESPONSES="$resp" \
+    bash -c '. "$0/bin/backends/herdr.sh"; fm_backend_herdr_name_agent_best_effort default:w1:p2 crew-id ""' "$ROOT"
+  calls=$(herdr_name_agent_calls "$log")
+  [ "$calls" = "$(printf 'agent get\nagent rename')" ] ||
+    fail "a resumed registration must be named on the first attempt, never waited out for a change that cannot come, got: $(printf '%s' "$calls" | tr '\n' ',')"
+  renamed=$(herdr_name_agent_renamed_to "$log")
+  [ "$renamed" = crew-crew-id-af129fe0 ] ||
+    fail "the resumed agent must carry the crew name, got '$renamed'"
+  pass "fm_backend_herdr_name_agent_best_effort: a resumed relaunch names the registration already on the pane"
+}
+
 test_name_agent_never_names_an_unchanged_registration() {
   local dir log resp fb out status before
   before=$(printf 'claude\te79f82b9-922b-43cc-990f-e78078f1d96d')
@@ -6032,6 +6052,7 @@ test_name_agent_sanitizes_and_truncates_the_task_id
 test_name_agent_distinguishes_ids_sharing_a_long_head
 test_name_agent_retries_until_the_agent_registers
 test_name_agent_waits_for_the_successor_on_relaunch
+test_name_agent_names_a_resumed_registration_on_the_first_attempt
 test_name_agent_never_names_an_unchanged_registration
 test_name_agent_never_fails_the_spawn
 test_name_agent_gives_up_on_an_unparseable_target

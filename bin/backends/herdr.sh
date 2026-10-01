@@ -2560,15 +2560,20 @@ EOF
 # rename, or an agent that never registers silently leaves the harness label
 # in place rather than failing the spawn.
 #
-# <pre-launch-agent-ref> is the pane's fm_backend_herdr_pane_agent_session_ref
-# read BEFORE the launch line was sent, and it is what makes "herdr accepted a
-# rename" mean "herdr named THIS spawn's agent". A fresh spawn owns a brand-new
-# pane and reads empty, so its first registration satisfies the anchor
-# immediately. A --relaunch adopts the recorded pane (bin/fm-spawn.sh), which
-# may still carry the predecessor's registration, so a rename is withheld until
-# the pane's reference is non-empty AND no longer the captured one - otherwise
-# the name lands on the corpse and the successor, which registers about a
-# second later, keeps the bare harness label.
+# <pre-launch-agent-ref> is what makes "herdr accepted a rename" mean "herdr
+# named THIS spawn's agent": a rename is withheld until the pane's reference is
+# non-empty AND no longer that value. bin/fm-spawn.sh passes the pane's
+# fm_backend_herdr_pane_agent_session_ref read BEFORE the launch line was sent
+# ONLY when the launch does not resume onto the identity the pane already
+# reports, and passes empty otherwise, which is the whole of the distinction:
+#   - fresh spawn: brand-new pane, nothing registered, reads empty anyway, so
+#     the first registration is named;
+#   - --relaunch onto a fresh session: the adopted pane may still carry the
+#     predecessor's registration, so naming it would leave the successor -
+#     which registers about a second later - under its bare harness label;
+#   - --relaunch resuming the recorded identity (Pi's `--session`): the
+#     successor deliberately re-registers on that SAME reference, so there is
+#     no change to wait for and the empty value names it as soon as it reads.
 #
 # The name alphabet and the registration delay are verified facts owned by
 # docs/verification/runtime-backends.md "Herdr": a name must start with a
