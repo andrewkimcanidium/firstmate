@@ -5333,6 +5333,14 @@ if ! (umask 077 && printf '%s\n' "$LAUNCH" >"$LAUNCH_STAGE" &&
 fi
 sleep 0.3
 SPAWN_LAUNCH_SENT=1
+# Read before the launch line so the agent naming below can tell this spawn's
+# registration from whatever the adopted pane already carried: a fresh pane
+# reads empty, a --relaunch may still read its predecessor.
+HERDR_PRELAUNCH_AGENT_REF=
+if [ "$BACKEND" = herdr ] && fm_backend_herdr_parse_target "$T"; then
+  HERDR_PRELAUNCH_AGENT_REF=$(fm_backend_herdr_pane_agent_session_ref \
+    "$FM_BACKEND_HERDR_SESSION" "$FM_BACKEND_HERDR_PANE") || HERDR_PRELAUNCH_AGENT_REF=
+fi
 spawn_send_literal "$T" ". $(shell_quote "$LAUNCH_FILE")"
 sleep 0.3
 if [ "${HERDR_PROJECTED:-0}" -eq 1 ]; then
@@ -5344,9 +5352,10 @@ spawn_send_key "$T" Enter
 # an agent for the pane a beat after its harness process starts, and names it
 # after the harness, so every worker and its supervisor read as the same entry
 # in the agent panel until this renames them apart. The helper owns the name
-# rules and never fails the spawn.
+# rules, waits for a registration newer than the pre-launch one, and never
+# fails the spawn.
 if [ "$BACKEND" = herdr ]; then
-  fm_backend_herdr_name_agent_best_effort "$T" "$ID"
+  fm_backend_herdr_name_agent_best_effort "$T" "$ID" "$HERDR_PRELAUNCH_AGENT_REF"
 fi
 if [ "$HARNESS" = kimi ]; then
   if ! kimi_wait_for_ready; then

@@ -117,6 +117,11 @@ Every worker's agent is renamed to `crew-<head>-<digest>` once its harness regis
 Herdr accepts a name of at most 32 characters that starts with a lowercase letter and holds only lowercase letters, digits, `-` and `_`, so the task id is lowercased, every other character is folded to `-`, and the result is cut to an 18-character readable `<head>`; `<digest>` is the eight-hex-digit `cksum` of the WHOLE task id, so two ids that share a head still name their panes apart.
 The name is presentation only: endpoint identity stays the recorded session, workspace, tab, and pane, the rename writes only the agent's `name` field and never the harness label the adapter branches on, and a rename Herdr refuses silently leaves that harness label in place rather than failing the spawn.
 
+The spawn reads the pane's agent session reference BEFORE sending the launch line and renames only once the pane reports a reference that is non-empty and different from that one, within a bounded poll budget.
+A fresh spawn owns a brand-new pane, reads nothing, and is named by its first registration.
+A `--relaunch` adopts the recorded pane, which may still carry the predecessor's registration, and that anchor is what stops the name landing on the predecessor and leaving the successor - which registers about a second later - under its bare harness label.
+A successor that never registers inside the budget keeps the harness label silently.
+
 ### Focus
 
 Workspace and tab creation use `--no-focus`.

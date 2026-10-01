@@ -2560,6 +2560,16 @@ EOF
 # rename, or an agent that never registers silently leaves the harness label
 # in place rather than failing the spawn.
 #
+# <pre-launch-agent-ref> is the pane's fm_backend_herdr_pane_agent_session_ref
+# read BEFORE the launch line was sent, and it is what makes "herdr accepted a
+# rename" mean "herdr named THIS spawn's agent". A fresh spawn owns a brand-new
+# pane and reads empty, so its first registration satisfies the anchor
+# immediately. A --relaunch adopts the recorded pane (bin/fm-spawn.sh), which
+# may still carry the predecessor's registration, so a rename is withheld until
+# the pane's reference is non-empty AND no longer the captured one - otherwise
+# the name lands on the corpse and the successor, which registers about a
+# second later, keeps the bare harness label.
+#
 # The name alphabet and the registration delay are verified facts owned by
 # docs/verification/runtime-backends.md "Herdr": a name must start with a
 # lowercase letter, hold only lowercase letters, digits, '-' and '_', and stay
@@ -2568,14 +2578,17 @@ EOF
 # characters: the task id folded to that alphabet and cut to a readable
 # 18-character head, plus a checksum of the WHOLE id so two ids sharing a head
 # still name their panes apart, under a bounded settle retry.
-fm_backend_herdr_name_agent_best_effort() {  # <target> <task-id>
-  local target=$1 task_id=$2 name head digest attempt=0 max_attempts=${FM_BACKEND_HERDR_AGENT_NAME_POLLS:-8}
+fm_backend_herdr_name_agent_best_effort() {  # <target> <task-id> <pre-launch-agent-ref>
+  local target=$1 task_id=$2 before=${3-} name head digest ref attempt=0 max_attempts=${FM_BACKEND_HERDR_AGENT_NAME_POLLS:-8}
   head=$(printf '%s' "$task_id" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9_-' '-' | cut -c 1-18)
   digest=$(printf '%s' "$task_id" | cksum | awk '{printf "%08x", $1}')
   name=crew-$head-$digest
   fm_backend_herdr_parse_target "$target" || return 0
   while :; do
-    fm_backend_herdr_cli "$FM_BACKEND_HERDR_SESSION" agent rename "$FM_BACKEND_HERDR_PANE" "$name" >/dev/null 2>&1 && return 0
+    ref=$(fm_backend_herdr_pane_agent_session_ref "$FM_BACKEND_HERDR_SESSION" "$FM_BACKEND_HERDR_PANE") || ref=
+    if [ -n "$ref" ] && [ "$ref" != "$before" ]; then
+      fm_backend_herdr_cli "$FM_BACKEND_HERDR_SESSION" agent rename "$FM_BACKEND_HERDR_PANE" "$name" >/dev/null 2>&1 && return 0
+    fi
     attempt=$((attempt + 1))
     [ "$attempt" -lt "$max_attempts" ] || return 0
     sleep 0.25
