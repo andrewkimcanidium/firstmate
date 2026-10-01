@@ -119,6 +119,7 @@ The name is presentation only: endpoint identity stays the recorded session, wor
 
 The rename is attempted straight after the launch line and retried inside a bounded poll budget, because no agent exists to rename until about a second after that line runs.
 A rename Herdr never accepts inside the budget keeps the harness label silently.
+A harness Herdr ships no agent integration for registers no agent at all, so nothing is ever renamed for its panes; [`verification/rovo.md`](verification/rovo.md) records `rovo` as one such harness on the measured build.
 
 KNOWN LIMITATION: the rename succeeds on whatever registration the pane reports when Herdr accepts it.
 On a `--relaunch` into a pane that still carries a predecessor's lingering registration, the name can land on that record, and the replacement then keeps its bare harness label.
@@ -844,6 +845,7 @@ Tests use thin compatibility wrappers in `tests/herdr-test-safety.sh` and never 
 - A Firstmate outside Herdr cannot resolve a launcher workspace, so a colliding home label refuses new spawns until the collision is cleared.
 - Ghost and placeholder recognition uses ANSI de-emphasis when available; an unstyled glyph row carrying trailing non-idle text fails safely to `unknown`.
 - Only tmux and Herdr can host the away-mode supervisor terminal.
+- [Agent names](#agent-names) are presentation-only and best-effort; a rename Herdr never accepts leaves that worker under its harness name.
 
 ## Regression entry points
 

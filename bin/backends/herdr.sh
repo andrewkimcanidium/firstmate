@@ -2569,7 +2569,7 @@ EOF
 # docs/verification/runtime-backends.md "Herdr": a name must start with a
 # lowercase letter, hold only lowercase letters, digits, '-' and '_', and stay
 # within 32 characters, and no agent exists to rename until about a second
-# after its launch line runs. Hence crew-<head>-<digest>, exactly 32
+# after its launch line runs. Hence crew-<head>-<digest>, within those 32
 # characters: the task id folded to that alphabet and cut to a readable
 # 18-character head, plus a checksum of the WHOLE id so two ids sharing a head
 # still name their panes apart, under a bounded settle retry.
