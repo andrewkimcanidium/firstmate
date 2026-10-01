@@ -113,8 +113,9 @@ Routine supervision uses `bin/fm-peek.sh <id>` and `FM_HOME=<home> bin/fm-send.s
 
 ### Agent names
 
-Every worker's agent is renamed to `crew-<task-id>` once its harness registers, so Herdr's agent panel separates workers from their supervisor and from each other instead of listing them all under the harness name.
-The name is presentation only: endpoint identity stays the recorded session, workspace, tab, and pane, and a rename Herdr refuses leaves the harness label in place behind a warning rather than failing the spawn.
+Every worker's agent is renamed to `crew-<head>-<digest>` once its harness registers, so Herdr's agent panel separates workers from their supervisor and from each other instead of listing them all under the harness name.
+Herdr accepts a name of at most 32 characters that starts with a lowercase letter and holds only lowercase letters, digits, `-` and `_`, so the task id is lowercased, every other character is folded to `-`, and the result is cut to an 18-character readable `<head>`; `<digest>` is the eight-hex-digit `cksum` of the WHOLE task id, so two ids that share a head still name their panes apart.
+The name is presentation only: endpoint identity stays the recorded session, workspace, tab, and pane, the rename writes only the agent's `name` field and never the harness label the adapter branches on, and a rename Herdr refuses silently leaves that harness label in place rather than failing the spawn.
 
 ### Focus
 

@@ -3696,7 +3696,7 @@ test_normalize_key() {
   pass "fm_backend_herdr_normalize_key: Enter/Escape/C-c map to herdr's verified enter/escape/ctrl+c"
 }
 
-# --- agent naming: the presentation-only crew-<task-id> label ----------------
+# --- agent naming: the presentation-only crew-<head>-<digest> label ---------
 
 test_name_agent_sanitizes_and_truncates_the_task_id() {
   local dir log resp fb
@@ -3704,9 +3704,33 @@ test_name_agent_sanitizes_and_truncates_the_task_id() {
   fb=$(make_herdr_fakebin "$dir")
   PATH="$fb:$PATH" FM_HERDR_LOG="$log" FM_HERDR_RESPONSES="$resp" \
     bash -c '. "$0/bin/backends/herdr.sh"; fm_backend_herdr_name_agent_best_effort default:w1:p2 "FM-Name/Herdr.Agents-With-A-Very-Long-Tail"' "$ROOT"
-  assert_contains "$(cat "$log")" "HERDR_SESSION=default"$'\x1f''agent'$'\x1f''rename'$'\x1f''w1:p2'$'\x1f''crew-fm-name-herdr-agents-with-a'$'\x1f''--session' \
-    "the rename did not fold the task id to herdr's lowercase alphabet and truncate it to the 32-character limit"
-  pass "fm_backend_herdr_name_agent_best_effort: renames the agent to crew-<task-id> folded to herdr's accepted name alphabet and length"
+  assert_contains "$(cat "$log")" "HERDR_SESSION=default"$'\x1f''agent'$'\x1f''rename'$'\x1f''w1:p2'$'\x1f''crew-fm-name-herdr-agen-26f3738d'$'\x1f''--session' \
+    "the rename did not fold the task id to herdr's lowercase alphabet under a crew-<head>-<digest> name inside the 32-character limit"
+  pass "fm_backend_herdr_name_agent_best_effort: renames the agent to crew-<head>-<digest> folded to herdr's accepted name alphabet and length"
+}
+
+test_name_agent_distinguishes_ids_sharing_a_long_head() {
+  local dir log resp fb id name prev=
+  # Two ordinary task ids that agree for their first 30 characters: the
+  # readable head alone cannot tell their panes apart, so the digest must.
+  for id in fix-the-login-redirect-bug-on-safari fix-the-login-redirect-bug-on-firefox; do
+    dir="$TMP_ROOT/name-agent-$id"; mkdir -p "$dir/responses"; log="$dir/log"; resp="$dir/responses"; : > "$log"
+    fb=$(make_herdr_fakebin "$dir")
+    PATH="$fb:$PATH" FM_HERDR_LOG="$log" FM_HERDR_RESPONSES="$resp" \
+      bash -c '. "$0/bin/backends/herdr.sh"; fm_backend_herdr_name_agent_best_effort default:w1:p2 "$1"' "$ROOT" "$id"
+    name=$(awk -v FS="$(printf '\x1f')" '$2 == "agent" && $3 == "rename" { print $5 }' "$log")
+    case "$name" in
+      crew-[a-z]*) ;;
+      *) fail "the name for '$id' must start with crew- and herdr's required lowercase letter, got '$name'" ;;
+    esac
+    [ "${#name}" -le 32 ] || fail "the name for '$id' must stay within herdr's 32-character limit, got ${#name} characters in '$name'"
+    case "$name" in
+      *[!a-z0-9_-]*) fail "the name for '$id' must hold only lowercase letters, digits, '-' and '_', got '$name'" ;;
+    esac
+    [ "$name" != "$prev" ] || fail "two task ids sharing a long head must not collide on one agent name, both got '$name'"
+    prev=$name
+  done
+  pass "fm_backend_herdr_name_agent_best_effort: task ids sharing a long head still name their panes apart"
 }
 
 test_name_agent_retries_until_the_agent_registers() {
@@ -3733,9 +3757,21 @@ test_name_agent_never_fails_the_spawn() {
     bash -c '. "$0/bin/backends/herdr.sh"; fm_backend_herdr_name_agent_best_effort default:w1:p2 crew-id' "$ROOT" 2>&1 )
   status=$?
   [ "$status" = 0 ] || fail "a refused presentation rename must not fail its spawn, got status $status"
-  assert_contains "$out" "warning: herdr did not accept the name" \
-    "a refused rename should leave a warning naming the label the worker keeps"
-  pass "fm_backend_herdr_name_agent_best_effort: a rename herdr keeps refusing warns and still succeeds"
+  [ -z "$out" ] || fail "a refused presentation rename must stay silent on a healthy spawn, got '$out'"
+  pass "fm_backend_herdr_name_agent_best_effort: a rename herdr keeps refusing is a silent, successful no-op"
+}
+
+test_name_agent_gives_up_on_an_unparseable_target() {
+  local dir log resp fb out status
+  dir="$TMP_ROOT/name-agent-bad-target"; mkdir -p "$dir/responses"; log="$dir/log"; resp="$dir/responses"; : > "$log"
+  fb=$(make_herdr_fakebin "$dir")
+  out=$( PATH="$fb:$PATH" FM_HERDR_LOG="$log" FM_HERDR_RESPONSES="$resp" \
+    bash -c '. "$0/bin/backends/herdr.sh"; fm_backend_herdr_name_agent_best_effort nonsense crew-id' "$ROOT" 2>&1 )
+  status=$?
+  [ "$status" = 0 ] || fail "an unparseable target must not fail its spawn, got status $status"
+  [ -z "$out" ] || fail "an unparseable target must stay silent, got '$out'"
+  [ ! -s "$log" ] || fail "an unparseable target must not reach herdr at all, got $(cat "$log")"
+  pass "fm_backend_herdr_name_agent_best_effort: an unparseable target renames nothing and still succeeds"
 }
 
 # --- capture / send_key / kill / current_path --------------------------------
@@ -5917,8 +5953,10 @@ test_list_live_scoped_to_this_homes_workspace_only
 test_parse_target
 test_normalize_key
 test_name_agent_sanitizes_and_truncates_the_task_id
+test_name_agent_distinguishes_ids_sharing_a_long_head
 test_name_agent_retries_until_the_agent_registers
 test_name_agent_never_fails_the_spawn
+test_name_agent_gives_up_on_an_unparseable_target
 test_capture_calls_pane_read
 test_capture_works_around_small_lines_bug
 test_capture_preserves_pane_read_failure
