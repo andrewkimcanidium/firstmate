@@ -238,9 +238,12 @@ test_bounds_the_command_on_a_shell_without_bashpid() {
   out=$(
     exec 2>&1
     unset BASHPID
+    [ -z "${BASHPID:-}" ] || exit 70
     . "$ROOT/bin/fm-timeout-lib.sh"
     PATH=$PERL_ONLY fm_exec_timed 5 1 bash -c 'echo bounded; exit 7'
   ) || rc=$?
+  [ "$rc" -ne 70 ] \
+    || fail "BASHPID outlived the unset, so this shell never took the BASHPID-less path"
   [ "$rc" -eq 7 ] || fail "a shell without BASHPID lost the command's status (rc=$rc: $out)"
   [ "$out" = bounded ] || fail "a shell without BASHPID did not run the command ($out)"
   pass "fm_exec_timed bounds a command on a shell too old for BASHPID"
@@ -251,7 +254,7 @@ test_bounds_the_command_on_a_shell_without_bashpid() {
 # script's own parent: the parent outlives the teardown that killed the script,
 # so an owner read from it would leave the command running to its full bound.
 test_an_owner_that_dies_is_detected_without_bashpid() {
-  local dir watchdog started
+  local dir watchdog started observed
   dir="$TMP_ROOT/no-bashpid-owner"
   mkdir -p "$dir"
   # shellcheck disable=SC2016
@@ -259,6 +262,7 @@ test_an_owner_that_dies_is_detected_without_bashpid() {
     unset BASHPID
     . "$1/bin/fm-timeout-lib.sh"
     (
+      printf "bashpid=[%s]\n" "${BASHPID:-}" > "$2/bashpid"
       while kill -0 "$$" 2>/dev/null; do sleep 0.05; done
       fm_exec_timed 60 1 bash -c "exec sleep 300"
     ) >/dev/null 2>&1 &
@@ -266,6 +270,10 @@ test_an_owner_that_dies_is_detected_without_bashpid() {
     exit 0
   ' _ "$ROOT" "$dir"
   wait_for_file "$dir/watchdog"
+  wait_for_file "$dir/bashpid"
+  observed=$(cat "$dir/bashpid")
+  [ "$observed" = 'bashpid=[]' ] \
+    || fail "BASHPID came back inside the subshell, so the owner was never captured without it ($observed)"
   watchdog=$(cat "$dir/watchdog")
   started=$SECONDS
   while kill -0 "$watchdog" 2>/dev/null; do
