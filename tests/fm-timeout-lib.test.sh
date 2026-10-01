@@ -5,7 +5,10 @@
 # refusal instead of an unbounded run when nothing on the host can enforce the
 # bound. Most cases pin the perl watchdog, the preferred mechanism and the only
 # one a stock macOS host has, under a PATH that holds no timeout variant; the
-# GNU fallback case runs only where a real timeout exists.
+# GNU fallback case runs only where a real timeout exists. Two cases unset
+# BASHPID to stand in for the bash 3.2 that same host ships, where fm_exec_timed
+# cannot read the subshell case off that variable and must still own the bound
+# by the calling script rather than by the script's parent.
 # shellcheck disable=SC2016 # each bounded bash -c script expands its own arguments
 set -u
 
