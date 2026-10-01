@@ -106,13 +106,13 @@ test_the_bound_replaces_the_calling_shell() {
   dir="$TMP_ROOT/replace"
   mkdir -p "$dir"
   for path in "$PATH" "$PERL_ONLY"; do
-    rm -f "$dir/caller" "$dir/parent"
+    rm -f "$dir/parent"
     (
       . "$ROOT/bin/fm-timeout-lib.sh"
-      printf '%s\n' "$BASHPID" > "$dir/caller"
       PATH=$path fm_exec_timed 5 1 bash -c 'echo "$PPID" > "$1"' _ "$dir/parent"
-    ) || fail "the bounded probe failed under PATH=$path"
-    caller=$(cat "$dir/caller")
+    ) &
+    caller=$!
+    wait "$caller" || fail "the bounded probe failed under PATH=$path"
     parent=$(cat "$dir/parent")
     [ "$caller" = "$parent" ] \
       || fail "the command's parent $parent is not the replaced caller $caller under PATH=$path"
@@ -211,10 +211,10 @@ test_an_owner_that_dies_during_startup_ends_the_command() {
   PATH=$PERL_ONLY bash -c '
     . "$1/bin/fm-timeout-lib.sh"
     (
-      echo "$BASHPID" > "$2/watchdog"
       while kill -0 "$$" 2>/dev/null; do sleep 0.05; done
       fm_exec_timed 60 1 bash -c "exec sleep 300"
     ) >/dev/null 2>&1 &
+    echo "$!" > "$2/watchdog"
     exit 0
   ' _ "$ROOT" "$dir"
   wait_for_file "$dir/watchdog"
@@ -244,6 +244,38 @@ test_bounds_the_command_on_a_shell_without_bashpid() {
   [ "$rc" -eq 7 ] || fail "a shell without BASHPID lost the command's status (rc=$rc: $out)"
   [ "$out" = bounded ] || fail "a shell without BASHPID did not run the command ($out)"
   pass "fm_exec_timed bounds a command on a shell too old for BASHPID"
+}
+
+# A shell with no BASHPID cannot read the subshell case off that variable, so
+# an unnamed owner must still resolve to the calling script rather than to the
+# script's own parent: the parent outlives the teardown that killed the script,
+# so an owner read from it would leave the command running to its full bound.
+test_an_owner_that_dies_is_detected_without_bashpid() {
+  local dir watchdog started
+  dir="$TMP_ROOT/no-bashpid-owner"
+  mkdir -p "$dir"
+  # shellcheck disable=SC2016
+  PATH=$PERL_ONLY bash -c '
+    unset BASHPID
+    . "$1/bin/fm-timeout-lib.sh"
+    (
+      while kill -0 "$$" 2>/dev/null; do sleep 0.05; done
+      fm_exec_timed 60 1 bash -c "exec sleep 300"
+    ) >/dev/null 2>&1 &
+    echo "$!" > "$2/watchdog"
+    exit 0
+  ' _ "$ROOT" "$dir"
+  wait_for_file "$dir/watchdog"
+  watchdog=$(cat "$dir/watchdog")
+  started=$SECONDS
+  while kill -0 "$watchdog" 2>/dev/null; do
+    if [ "$((SECONDS - started))" -ge 15 ]; then
+      kill -KILL "$watchdog" 2>/dev/null || true
+      fail "a shell without BASHPID owned the bound by the parent and ran on toward its bound"
+    fi
+    sleep 0.02
+  done
+  pass "fm_exec_timed owns the bound by the calling script on a shell without BASHPID"
 }
 
 # perl is preferred whenever it exists, because only its watchdog can reap a
@@ -354,6 +386,7 @@ test_a_signal_to_the_bounding_process_reaches_the_command
 test_a_named_owner_that_is_gone_ends_the_command
 test_an_owner_that_dies_during_startup_ends_the_command
 test_bounds_the_command_on_a_shell_without_bashpid
+test_an_owner_that_dies_is_detected_without_bashpid
 test_perl_is_preferred_over_timeout
 test_refuses_rather_than_running_unbounded
 test_rejects_malformed_bounds_before_running_anything
