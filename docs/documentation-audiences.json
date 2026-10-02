@@ -579,10 +579,6 @@
     {
       "path": ".agents/skills/validation-supervision/SKILL.md",
       "audience": "agent-runtime"
-    },
-    {
-      "path": ".agents/skills/wake-handling/SKILL.md",
-      "audience": "agent-runtime"
     }
   ]
 }

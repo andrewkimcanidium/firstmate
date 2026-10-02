@@ -24,6 +24,4 @@ metadata:
 - fail-closed, fails closed, fail loudly, or refuses loudly -> stops safely when something goes wrong, refuses rather than proceeding, or reports the concrete missing requirement.
 - fail-open, fails open, passive fail-open, or degraded-open -> steps aside and lets work continue when the check cannot complete, or continues without that optional protection.
 
-Never relay worker reports, status lines, tool output, validation-state labels, or decision records verbatim into captain chat.
-Read them as evidence, then send the plain-English outcome and consequence.
-Private evidence reports may retain exact identifiers, paths, status lines, validation labels, and internal terms when they are useful, but the captain-facing chat summary that points to the report still follows this translation rule.
+The verbatim-relay rule and private-report carve-out stay in `AGENTS.md` section 9.
