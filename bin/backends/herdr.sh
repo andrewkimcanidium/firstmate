@@ -180,6 +180,33 @@ fm_backend_herdr_presentation_preference() {  # <config-dir>
   esac
 }
 
+# The config item a home writes to opt in to presentation-only agent naming.
+FM_BACKEND_HERDR_AGENT_NAMES_CONFIG="herdr-agent-names"
+
+# fm_backend_herdr_agent_names_enabled <config-dir>: the single owner of
+# config/herdr-agent-names parsing. Succeeds only when the home opted in to
+# fm_backend_herdr_name_agent_best_effort: "on", or an empty file in the
+# presence-based opt-in form. Naming defaults to off, so an absent file or
+# "off" fails, and an unrecognized value warns and falls back to off rather
+# than failing a spawn over a purely visual setting. Values are read with the
+# same whitespace-stripped, case-folded convention as
+# fm_backend_herdr_presentation_preference.
+fm_backend_herdr_agent_names_enabled() {  # <config-dir>
+  local config_dir=${1:-} file value
+  [ -n "$config_dir" ] || return 1
+  file="$config_dir/$FM_BACKEND_HERDR_AGENT_NAMES_CONFIG"
+  [ -f "$file" ] || return 1
+  value=$(tr -d '[:space:]' < "$file" 2>/dev/null | tr '[:upper:]' '[:lower:]') || value=""
+  case "$value" in
+    ''|on) return 0 ;;
+    off) return 1 ;;
+    *)
+      echo "warning: $file: unrecognized value \"$value\"; herdr agent naming stays off (write \"on\" to name worker agents, \"off\" to keep their harness labels)" >&2
+      return 1
+      ;;
+  esac
+}
+
 # fm_backend_herdr_version_at_least <candidate> <floor>: numeric dotted-release
 # comparison. Return codes: 0 candidate >= floor, 1 candidate < floor, 2 the
 # candidate is unparseable. Any prerelease or build suffix is stripped first, so

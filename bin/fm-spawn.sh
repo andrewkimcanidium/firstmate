@@ -5343,9 +5343,10 @@ spawn_send_key "$T" Enter
 # Presentation only, and only once the launch line is running: herdr registers
 # an agent for the pane a beat after its harness process starts, and names it
 # after the harness, so every worker and its supervisor read as the same entry
-# in the agent panel until this renames them apart. The helper owns the name
-# rules and never fails the spawn.
-if [ "$BACKEND" = herdr ]; then
+# in the agent panel until this renames them apart. Opt-in through
+# config/herdr-agent-names, so a home that has not opted in makes no extra
+# herdr call here. The helper owns the name rules and never fails the spawn.
+if [ "$BACKEND" = herdr ] && fm_backend_herdr_agent_names_enabled "$CONFIG"; then
   fm_backend_herdr_name_agent_best_effort "$T" "$ID"
 fi
 if [ "$HARNESS" = kimi ]; then

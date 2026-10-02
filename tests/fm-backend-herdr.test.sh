@@ -3796,6 +3796,54 @@ test_name_agent_gives_up_on_an_unparseable_target() {
   pass "fm_backend_herdr_name_agent_best_effort: an unparseable target renames nothing and still succeeds"
 }
 
+# herdr_name_agent_opted_in: run the spawn's naming step - the
+# config/herdr-agent-names opt-in gating the helper - against <config-dir>
+# under the fake CLI, printing its stderr.
+herdr_name_agent_opted_in() {  # <dir> <config-dir>
+  local dir=$1 config=$2 fb
+  mkdir -p "$dir/responses"; : > "$dir/log"
+  fb=$(make_herdr_fakebin "$dir")
+  PATH="$fb:$PATH" FM_HERDR_LOG="$dir/log" FM_HERDR_RESPONSES="$dir/responses" \
+    bash -c '. "$0/bin/backends/herdr.sh"; if fm_backend_herdr_agent_names_enabled "$1"; then fm_backend_herdr_name_agent_best_effort default:w1:p2 crew-id; fi' "$ROOT" "$config" 2>&1
+}
+
+test_name_agent_on_config_issues_the_rename() {
+  local dir config value out
+  for value in on '' ' On '; do
+    dir="$TMP_ROOT/name-agent-optin-on-${#value}"; config="$dir/config"; mkdir -p "$config"
+    printf '%s\n' "$value" > "$config/herdr-agent-names"
+    out=$(herdr_name_agent_opted_in "$dir" "$config")
+    [ -z "$out" ] || fail "an opted-in naming config must stay silent, got '$out'"
+    [ "$(herdr_name_agent_rename_count "$dir/log")" = 1 ] ||
+      fail "config/herdr-agent-names '$value' must issue the rename, got log $(cat "$dir/log")"
+  done
+  pass "config/herdr-agent-names: on, or an empty file, opts the spawn in to the agent rename"
+}
+
+test_name_agent_off_or_absent_config_makes_no_herdr_call() {
+  local dir config out
+  dir="$TMP_ROOT/name-agent-optin-absent"; config="$dir/config"; mkdir -p "$config"
+  out=$(herdr_name_agent_opted_in "$dir" "$config")
+  [ -z "$out" ] || fail "an absent naming config must stay silent, got '$out'"
+  [ ! -s "$dir/log" ] || fail "an absent naming config must make no herdr call, got $(cat "$dir/log")"
+  dir="$TMP_ROOT/name-agent-optin-off"; config="$dir/config"; mkdir -p "$config"
+  printf 'OFF\n' > "$config/herdr-agent-names"
+  out=$(herdr_name_agent_opted_in "$dir" "$config")
+  [ -z "$out" ] || fail "an off naming config must stay silent, got '$out'"
+  [ ! -s "$dir/log" ] || fail "an off naming config must make no herdr call, got $(cat "$dir/log")"
+  pass "config/herdr-agent-names: naming defaults to off, and off or absent makes no herdr call"
+}
+
+test_name_agent_unrecognized_config_warns_and_stays_off() {
+  local dir config out
+  dir="$TMP_ROOT/name-agent-optin-typo"; config="$dir/config"; mkdir -p "$config"
+  printf 'yes\n' > "$config/herdr-agent-names"
+  out=$(herdr_name_agent_opted_in "$dir" "$config")
+  assert_contains "$out" 'unrecognized value "yes"' "an unrecognized naming value must warn naming it"
+  [ ! -s "$dir/log" ] || fail "an unrecognized naming value must behave as off, got $(cat "$dir/log")"
+  pass "config/herdr-agent-names: an unrecognized value warns and falls back to off"
+}
+
 # --- capture / send_key / kill / current_path --------------------------------
 
 test_capture_calls_pane_read() {
@@ -5979,6 +6027,9 @@ test_name_agent_distinguishes_ids_sharing_a_long_head
 test_name_agent_retries_until_the_agent_registers
 test_name_agent_never_fails_the_spawn
 test_name_agent_gives_up_on_an_unparseable_target
+test_name_agent_on_config_issues_the_rename
+test_name_agent_off_or_absent_config_makes_no_herdr_call
+test_name_agent_unrecognized_config_warns_and_stays_off
 test_capture_calls_pane_read
 test_capture_works_around_small_lines_bug
 test_capture_preserves_pane_read_failure

@@ -113,7 +113,12 @@ Routine supervision uses `bin/fm-peek.sh <id>` and `FM_HOME=<home> bin/fm-send.s
 
 ### Agent names
 
-Every worker's agent is renamed to `crew-<head>-<digest>` once its harness registers, so Herdr's agent panel separates workers from their supervisor and from each other instead of listing them all under the harness name.
+Agent naming is opt-in and OFF by default.
+A home opts in through the local `config/herdr-agent-names` file: `on`, or an empty file in the presence-based opt-in form, enables it; `off`, or no file at all, leaves it off.
+Values are read whole-file with whitespace stripped and case folded, and an unrecognized value warns naming it and falls back to off rather than failing a spawn.
+While naming is off, a spawn makes no extra Herdr call for it and every worker keeps its harness label.
+
+Once a home opts in, each worker's agent is renamed to `crew-<head>-<digest>` once its harness registers, so Herdr's agent panel separates workers from their supervisor and from each other instead of listing them all under the harness name.
 Herdr accepts a name of at most 32 characters that starts with a lowercase letter and holds only lowercase letters, digits, `-` and `_`, so the task id is lowercased, every other character is folded to `-`, and the result is cut to an 18-character readable `<head>`; `<digest>` is the eight-hex-digit `cksum` of the WHOLE task id, so two ids that share a head still name their panes apart.
 The name is presentation only: endpoint identity stays the recorded session, workspace, tab, and pane, the rename writes only the agent's `name` field and never the harness label the adapter branches on, and a rename Herdr refuses silently leaves that harness label in place rather than failing the spawn.
 
@@ -845,7 +850,7 @@ Tests use thin compatibility wrappers in `tests/herdr-test-safety.sh` and never 
 - A Firstmate outside Herdr cannot resolve a launcher workspace, so a colliding home label refuses new spawns until the collision is cleared.
 - Ghost and placeholder recognition uses ANSI de-emphasis when available; an unstyled glyph row carrying trailing non-idle text fails safely to `unknown`.
 - Only tmux and Herdr can host the away-mode supervisor terminal.
-- [Agent names](#agent-names) are presentation-only and best-effort; a rename Herdr never accepts leaves that worker under its harness name.
+- [Agent names](#agent-names) are opt-in, off by default, presentation-only, and best-effort; a rename Herdr never accepts leaves that worker under its harness name.
 
 ## Regression entry points
 
