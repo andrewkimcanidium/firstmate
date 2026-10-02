@@ -1,0 +1,27 @@
+herdr session: fm-lab-agent-naming-81923-28181   herdr herdr 0.9.3   claude 2.1.285 (Claude Code)
+--- spawn Herdr-Naming-Alpha-Worker.With.Dots (claude): rc=0
+--- spawn Herdr-Naming-Alpha-Worker.With.Dashes (claude): rc=0
+--- spawn plainshell-worker (sh -c 'sleep 600'): rc=0
+supervisor pane w1:p5 -> {"pane_id":"w1:p5","agent":"claude","name":null,"code":null,"agent_status":"idle"}
+pane w1:p2 -> {"pane_id":"w1:p2","agent":"claude","name":"crew-herdr-naming-alpha-f8054e83","code":null,"agent_status":"blocked"}
+pane w1:p3 -> {"pane_id":"w1:p3","agent":"claude","name":"crew-herdr-naming-alpha-37e54baa","code":null,"agent_status":"blocked"}
+pane w1:p4 -> {"pane_id":null,"agent":null,"name":null,"code":"agent_not_found","agent_status":null}
+--- herdr agent list (the agent panel's data):
+{"pane_id":"w1:p2","agent":"claude","name":"crew-herdr-naming-alpha-f8054e83"}
+{"pane_id":"w1:p3","agent":"claude","name":"crew-herdr-naming-alpha-37e54baa"}
+{"pane_id":"w1:p5","agent":"claude","name":null}
+--- fm-peek on worker A (control path still reads the renamed worker):
+
+  Important: Only use Claude Code with files you trust. Accessing untrusted files may pose security risks
+  https://code.claude.com/docs/en/security
+
+  ❯ No, disable external imports
+    Yes, allow external imports
+
+  Enter to confirm · Esc to cancelfm-peek rc=0
+--- spawn stderr (A):
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.1oTFER
+warning: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.1oTFER/data/Herdr-Naming-Alpha-Worker.With.Dots/launch-brief.md records no ship branch; defaulting to legacy branch fm/Herdr-Naming-Alpha-Worker.With.Dots
+warning: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.1oTFER/data/Herdr-Naming-Alpha-Worker.With.Dots/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+notice: Herdr-Naming-Alpha-Worker.With.Dots ships mode=local-only while the standing posture for scratch is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+teardown rc=0
