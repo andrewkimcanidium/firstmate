@@ -5085,11 +5085,14 @@ if [ "$HARNESS" = rovo ]; then
   LAUNCH=${LAUNCH//__ROVOCONFIGOVERRIDE__/$ROVOCONFIGOVERRIDE}
 fi
 LAUNCH=${LAUNCH//__BRIEF__/$sq_brief}
-if [ "$HARNESS" = codex ] && [ -n "$usage_axi_suffix" ]; then
-  codex_usage_suffix=$(json_escape "$usage_axi_suffix")
-  codex_usage_suffix=${codex_usage_suffix//\\/\\\\}
-  codex_usage_suffix=${codex_usage_suffix//\"/\\\"}
-  sq_turnend="$sq_turnend$codex_usage_suffix"
+if [ "$HARNESS" = codex ]; then
+  # Codex's notify command sits in a JSON string inside a double-quoted shell
+  # argument, so escape it for both: JSON first, then \ " $ ` for the shell.
+  sq_turnend=$(json_escape "$sq_turnend$usage_axi_suffix")
+  sq_turnend=${sq_turnend//\\/\\\\}
+  sq_turnend=${sq_turnend//\"/\\\"}
+  sq_turnend=${sq_turnend//\$/\\\$}
+  sq_turnend=${sq_turnend//\`/\\\`}
 fi
 LAUNCH=${LAUNCH//__TURNEND__/$sq_turnend}
 LAUNCH=${LAUNCH//__PIEXT__/$sq_piext}

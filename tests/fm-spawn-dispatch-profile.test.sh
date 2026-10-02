@@ -1911,17 +1911,24 @@ SH
   pass "Stop hook captures the named task once the hook is installed"
 }
 
-test_usage_capture_codex() {
-  local rec id command
-  id=capture-codex-z1
-  rec=$(make_spawn_case capture-codex codex "$id")
-  read_case_record "$rec"
-  cat > "$CASE_DIR/capture hook" <<'SH'
+write_capture_hook() {
+  cat > "$1" <<'SH'
 #!/usr/bin/env bash
-printf '%s|%s|%s\n' "$1" "$2" "$3" >> "$1/state/captured"
+printf '%s|%s|%s|%s\n' "$0" "$1" "$2" "$3" >> "$1/state/captured"
 SH
-  chmod +x "$CASE_DIR/capture hook"
-  USAGE_AXI_HOOK="$CASE_DIR/capture hook" run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" >/dev/null || fail "codex capture spawn failed"
+  chmod +x "$1"
+}
+
+test_usage_capture_codex() {
+  local rec id command hook
+  id=capture-codex-z1
+  # A literal $ or backtick in the home and hook paths must reach the hook as-is.
+  # shellcheck disable=SC2016
+  rec=$(make_spawn_case 'capture-codex-$HOME-`id`' codex "$id")
+  read_case_record "$rec"
+  hook="$CASE_DIR/capture \$HOME \`id\` hook"
+  write_capture_hook "$hook"
+  USAGE_AXI_HOOK="$hook" run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" >/dev/null || fail "codex capture spawn failed"
   # Execute the shell's actual argv construction, not a hand-decoded template.
   cat > "$FAKEBIN_DIR/codex" <<'SH'
 #!/usr/bin/env python3
@@ -1932,12 +1939,57 @@ SH
   chmod +x "$FAKEBIN_DIR/codex"
   command=$(cat "$LAUNCH_LOG")
   PATH="$FAKEBIN_DIR:$PATH" bash -c "$command" || fail "codex notify command failed"
-  assert_grep "$id|stop" "$HOME_DIR/state/captured" "codex named task capture missing"
-  pass "codex notify executes capture with valid JSON and shell quoting"
+  [ -f "$HOME_DIR/state/$id.turn-ended" ] || fail "codex turn-end marker missing"
+  [ "$(cat "$HOME_DIR/state/captured")" = "$hook|$HOME_DIR|$id|stop" ] ||
+    fail "codex capture did not receive the unchanged hook and home paths: $(cat "$HOME_DIR/state/captured")"
+  pass "codex notify passes literal \$ and backtick paths to the capture hook unchanged"
+}
+
+test_usage_capture_gemini() {
+  local rec id command out
+  id=capture-gemini-z1
+  rec=$(make_spawn_case capture-gemini gemini "$id")
+  read_case_record "$rec"
+  write_capture_hook "$CASE_DIR/capture hook"
+  USAGE_AXI_HOOK="$CASE_DIR/capture hook" run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" >/dev/null || fail "gemini capture spawn failed"
+  command=$(python3 - "$HOME_DIR/state/$id.gemini-settings.json" <<'PYTHON'
+import json,sys
+print(json.load(open(sys.argv[1]))['hooks']['AfterAgent'][0]['hooks'][0]['command'])
+PYTHON
+)
+  out=$(bash -c "$command") || fail "capture changed AfterAgent hook exit"
+  [ "$out" = '{}' ] || fail "AfterAgent hook must print exactly {}, got '$out'"
+  [ -f "$HOME_DIR/state/$id.turn-ended" ] || fail "gemini turn-end marker missing"
+  assert_grep "|$HOME_DIR|$id|stop" "$HOME_DIR/state/captured" "gemini named task capture missing"
+  pass "gemini AfterAgent captures the named task and still prints {}"
+}
+
+test_usage_capture_pi() {
+  local rec id out
+  id=capture-pi-z1
+  rec=$(make_spawn_case capture-pi pi "$id")
+  read_case_record "$rec"
+  write_capture_hook "$CASE_DIR/capture hook"
+  USAGE_AXI_HOOK="$CASE_DIR/capture hook" run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" >/dev/null || fail "pi capture spawn failed"
+  # Load the generated extension and fire turn_end; Node exits only after the
+  # touch and its capture callback have both finished.
+  out=$(EXT_PATH="$HOME_DIR/state/$id.pi-ext.ts" node --input-type=module 2>&1 <<'EOF'
+import { pathToFileURL } from "node:url";
+const mod = await import(pathToFileURL(process.env.EXT_PATH).href);
+const handlers = {};
+mod.default({ on: (name, fn) => { handlers[name] = fn; }, events: { on: () => {} } });
+handlers["turn_end"]({}, {});
+EOF
+) || fail "pi turn_end drive failed: $out"
+  [ -f "$HOME_DIR/state/$id.turn-ended" ] || fail "pi turn-end marker missing"
+  assert_grep "|$HOME_DIR|$id|stop" "$HOME_DIR/state/captured" "pi named task capture missing"
+  pass "pi turn_end runs the capture callback after the turn-end touch"
 }
 
 test_usage_capture_hook
 test_usage_capture_codex
+test_usage_capture_gemini
+test_usage_capture_pi
 
 test_no_profile_keeps_claude_profile_defaults
 test_claude_launch_brief_publishes_record_doorbell
