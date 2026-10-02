@@ -4417,12 +4417,14 @@ mkdir -p "$TASK_TMP/gotmp"
 mkdir -p "$STATE"
 STATE_REAL=$(cd "$STATE" && pwd -P)
 TURNEND="$STATE_REAL/$ID.turn-ended"
-# Keep generated hooks byte-identical when the home has not opted in.
+# Opt-in usage-axi capture (usage-axi docs/capture.md): each turn-end hook runs
+# one file test, so it stays off until the hook is installed.
 usage_axi_suffix=""
 pi_usage_callback=""
-if [ -x "${USAGE_AXI_HOOK:-}" ]; then
-  usage_axi_suffix="; $(shell_quote "$SCRIPT_DIR/fm-usage-capture.sh") $(shell_quote "$USAGE_AXI_HOOK") $(shell_quote "$FM_HOME") $(shell_quote "$ID") stop $(shell_quote "${USAGE_AXI_STORE:-}") || true"
-  pi_usage_callback=", () => execFile(\"bash\", [\"-c\", \"$(json_escape "${usage_axi_suffix#; }")\"])"
+if [ -n "${USAGE_AXI_HOOK:-}" ]; then
+  usage_axi_hook="[ ! -x $(shell_quote "$USAGE_AXI_HOOK") ] || $(shell_quote "$USAGE_AXI_HOOK") $(shell_quote "$FM_HOME") $(shell_quote "$ID") stop"
+  usage_axi_suffix="; $usage_axi_hook"
+  pi_usage_callback=", () => execFile(\"bash\", [\"-c\", \"$(json_escape "$usage_axi_hook")\"])"
 fi
 exclude_path() {
   local rel=$1 EXCL
