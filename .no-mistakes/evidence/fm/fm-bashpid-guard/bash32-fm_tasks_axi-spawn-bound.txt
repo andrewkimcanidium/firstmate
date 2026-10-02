@@ -1,0 +1,12 @@
+== real tasks-axi through fm_tasks_axi (FM_TASKS_AXI_TIMEOUT=30) on /bin/bash
+shell=3.2.57(1)-release
+status=0 out=0.2.6
+
+== wedged tasks-axi (sleeps 60) with FM_TASKS_AXI_TIMEOUT=2
+shell=3.2.57(1)-release
+status=124 out=
+reported as bound expiry
+elapsed=2s
+
+== CORRECTED: same real call through a BASE (8690c41) bin/ tree on /bin/bash
+status=1 out=/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/tmp.yLvDLBF44a/bin/fm-timeout-lib.sh: line 224: BASHPID: unbound variable

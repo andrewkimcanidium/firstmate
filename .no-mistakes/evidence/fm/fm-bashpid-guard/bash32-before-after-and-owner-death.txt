@@ -1,0 +1,12 @@
+== /bin/bash 3.2.57(1)-release: BASE 8690c41 lib, subshell call
+/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/tmp.aRCpZZ5rEc/base-lib.sh: line 224: BASHPID: unbound variable
+outer_exit=1
+
+== HEAD lib, subshell call
+bounded-ran
+rc=0
+outer_exit=0
+
+== HEAD lib, owner dies mid-run (subshell form): sleep 30 bound 20s, owner script killed after 1s
+sleep pid 76336 alive before:        1
+sleep alive 3s after owner killed: 0
