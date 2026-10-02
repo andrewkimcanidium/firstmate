@@ -1,0 +1,14 @@
+== real bin/fm-teardown.sh cap-claude-z2 in lab primary pane (USAGE_AXI_HOOK set) ==
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.2BSCfI
+teardown: reaping leaked worktree process(es) for cap-claude-z2: 60911 64527 77321
+teardown: force-killing leaked worktree process(es) for cap-claude-z2: 60911
+🌳 Worktree returned to pool.
+teardown cap-claude-z2 complete (window primary:fm-cap-claude-z2, worktree /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/thpool/.treehouse/demo-42dbb6/1/demo)
+Backlog: cap-claude-z2 just finished (this home keeps no markdown backlog at /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/data/backlog.md). Update /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/data/backlog.md - move cap-claude-z2 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+== store capture.log after teardown (stop row then teardown trigger) ==
+{"appended": 1, "at": "2026-10-02T18:23:01.567Z", "rows": 1, "sources": {"claude_projects": ["/Users/andrewkim/.claude/projects"], "codex_sessions": ["/Users/andrewkim/.codex/sessions"]}, "task": "cap-claude-z2", "transcripts": 200, "trigger": "stop", "unchanged": 0, "window": ["2026-10-02T00:00:00.000Z", "2026-10-03T00:00:00.000Z"]}
+{"appended": 0, "at": "2026-10-02T18:23:41.795Z", "rows": 1, "sources": {"claude_projects": ["/Users/andrewkim/.claude/projects"], "codex_sessions": ["/Users/andrewkim/.codex/sessions"]}, "task": "cap-claude-z2", "transcripts": 200, "trigger": "teardown", "unchanged": 1, "window": ["2026-10-02T00:00:00.000Z", "2026-10-03T00:00:00.000Z"]}
+== state after teardown ==
+operational-inbox
+terminal-outcomes
+home-summary.json

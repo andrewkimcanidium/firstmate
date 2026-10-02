@@ -1,0 +1,31 @@
+== spawn (real bin/fm-spawn.sh, USAGE_AXI_HOOK=real usage-axi capture-hook.sh, lab home) ==
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.2BSCfI
+warning: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.2BSCfI/data/cap-claude-z2/launch-brief.md records no ship branch; defaulting to legacy branch fm/cap-claude-z2
+warning: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.2BSCfI/data/cap-claude-z2/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+notice: cap-claude-z2 ships mode=local-only while the standing posture for demo is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned cap-claude-z2 harness=claude kind=ship mode=local-only yolo=on window=primary:fm-cap-claude-z2 worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/thpool/.treehouse/demo-42dbb6/1/demo
+
+== generated Claude Stop hook ==
+touch '/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/state/cap-claude-z2.turn-ended'; '/Users/andrewkim/.no-mistakes/worktrees/ebf490aaaabf/01M3YWFEKC8CJXS4JJ7WDJZHT1/bin/fm-busy-event.sh' apply '/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/state' 'cap-claude-z2' idle --gen 'g1790965368.62457.22674' --source claude-hook --event stop 2>/dev/null || true; [ ! -x '/Users/andrewkim/.treehouse/usage-axi-df242d/1/usage-axi/bin/capture-hook.sh' ] || '/Users/andrewkim/.treehouse/usage-axi-df242d/1/usage-axi/bin/capture-hook.sh' '/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.2BSCfI' 'cap-claude-z2' stop
+
+== worker pane ==
+ ▐▛███▛█   Claude Code v2.1.285
+▝▜██████▀  Opus 5.5 · Claude Team
+ ▝▝   ▝▝   /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/thpool/.treehouse/demo-42dbb6/1/demo
+  Get to finished work sooner with Opus 5.5. Switch anytime with /model.
+❯ : Firstmate operational input waiting: read '/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/state/operational-inbox/1790965369-5c86425122e81601.msg' and handle its contents
+  as Firstmate operational input.
+  Read 1 file
+⏺ READY
+✻ Crunched for 10s · done 1:23 PM
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/thpool/.treehouse/demo-42dbb6/1/demo   Opus 5.5 (medium) ☕ awake
+   ctx ░░░░░░░░░░ 4%  $0.20
+  ⏵⏵ bypass permissions on (shift+tab to cycle) · ← for agents
+
+== store capture.log ==
+{"appended": 1, "at": "2026-10-02T18:23:01.567Z", "rows": 1, "sources": {"claude_projects": ["/Users/andrewkim/.claude/projects"], "codex_sessions": ["/Users/andrewkim/.codex/sessions"]}, "task": "cap-claude-z2", "transcripts": 200, "trigger": "stop", "unchanged": 0, "window": ["2026-10-02T00:00:00.000Z", "2026-10-03T00:00:00.000Z"]}
+== usage_task.jsonl rows (task_id/trigger) ==
+cap-claude-z2 claude-code claude-opus-5-5 in 4 out 132 cache_r 41850 cost 0.125496 work_kind ship

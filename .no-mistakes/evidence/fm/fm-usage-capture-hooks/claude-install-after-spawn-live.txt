@@ -1,0 +1,9 @@
+== cap-claude-z3: spawned with USAGE_AXI_HOOK=/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.2BSCfI/slot/capture-hook.sh NOT yet installed ==
+spawned cap-claude-z3 harness=claude kind=ship mode=local-only yolo=on window=primary:fm-cap-claude-z3 worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/thpool/.treehouse/demo-42dbb6/1/demo
+turn 1 (READY): .turn-ended touched; capture.log unchanged, 0 rows for cap-claude-z3 (off until opt-in)
+hook then installed in place (exec wrapper to real usage-axi capture-hook.sh); note: a first attempt as a symlink was invoked at turn 2 but usage-axi resolves its package from $0, logging 'No module named usage_axi' to its own capture-hook.err - a lab install mistake, not firstmate
+turn 3 (THIRD) after install -> capture.log:
+{"appended": 1, "at": "2026-10-02T18:28:11.269Z", "rows": 1, "sources": {"claude_projects": ["/Users/andrewkim/.claude/projects"], "codex_sessions": ["/Users/andrewkim/.codex/sessions"]}, "task": "cap-claude-z3", "transcripts": 205, "trigger": "stop", "unchanged": 0, "window": ["2026-10-02T00:00:00.000Z", "2026-10-03T00:00:00.000Z"]}
+rows:
+cap-claude-z2 claude-code claude-opus-5-5 turns 2 out 132 cost 0.125496
+cap-claude-z3 claude-code claude-opus-5-5 turns 4 out 148 cost 0.124932

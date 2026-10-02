@@ -1,0 +1,14 @@
+== teardown cap-claude-z3 with USAGE_AXI_HOOK = hook that prints to stderr and exits 9 ==
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.2BSCfI
+teardown: reaping leaked worktree process(es) for cap-claude-z3: 50109 51067 51143 71399
+teardown: force-killing leaked worktree process(es) for cap-claude-z3: 50109
+🌳 Worktree returned to pool.
+simulated capture failure
+teardown cap-claude-z3 complete (window primary:fm-cap-claude-z3, worktree /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/thpool/.treehouse/demo-42dbb6/1/demo)
+Backlog: cap-claude-z3 just finished (this home keeps no markdown backlog at /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/data/backlog.md). Update /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/data/backlog.md - move cap-claude-z3 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+TD3_EXIT=0
+hook invocation record: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.2BSCfI|cap-claude-z3|teardown|argc=3
+state after teardown:
+operational-inbox
+terminal-outcomes
+home-summary.json

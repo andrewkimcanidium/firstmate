@@ -1,0 +1,17 @@
+== real codex worker spawned by bin/fm-spawn.sh in lab (USAGE_AXI_HOOK = real capture-hook.sh) ==
+spawned cap-codex-z1 harness=codex kind=ship mode=local-only yolo=on window=primary:fm-cap-codex-z1 worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/thpool/.treehouse/demo-42dbb6/1/demo
+notify argv decoded from the running codex process (ps):
+["bash", "-c", "touch '/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/state/cap-codex-z1.turn-ended'; [ ! -x '/Users/andrewkim/.treehouse/usage-axi-df242d/1/usage-axi/bin/capture-hook.sh' ] || '/Users/andrewkim/.treehouse/usage-axi-df242d/1/usage-axi/bin/capture-hook.sh' '/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.2BSCfI' 'cap-codex-z1' stop"]
+executed as codex does (argv + JSON payload): exit 0 in 0.02s, .turn-ended touched
+usage-axi capture.log entry:
+{"appended": 0, "at": "2026-10-02T18:26:14.435Z", "rows": 0, "sources": {"claude_projects": ["/Users/andrewkim/.claude/projects"], "codex_sessions": ["/Users/andrewkim/.codex/sessions"]}, "task": "cap-codex-z1", "transcripts": 204, "trigger": "stop", "unchanged": 0, "window": ["2026-10-02T00:00:00.000Z", "2026-10-03T00:00:00.000Z"]}
+(0 rows: codex was parked at its folder-trust prompt, so no transcript existed; usage-axi recorded that in its own capture-failures.log, notify still exit 0)
+
+== teardown cap-codex-z1 with USAGE_AXI_HOOK pointing at a not-installed path ==
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.2BSCfI
+teardown: reaping leaked worktree process(es) for cap-codex-z1: 38105 83329 85292
+teardown: force-killing leaked worktree process(es) for cap-codex-z1: 83329
+🌳 Worktree returned to pool.
+teardown cap-codex-z1 complete (window primary:fm-cap-codex-z1, worktree /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/thpool/.treehouse/demo-42dbb6/1/demo)
+Backlog: cap-codex-z1 just finished (this home keeps no markdown backlog at /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/data/backlog.md). Update /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.2BSCfI/data/backlog.md - move cap-codex-z1 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+capture.log unchanged by this teardown: yes (diffed)

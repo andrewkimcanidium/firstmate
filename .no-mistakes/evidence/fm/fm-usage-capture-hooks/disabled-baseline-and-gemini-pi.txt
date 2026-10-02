@@ -1,0 +1,14 @@
+== capture-disabled baseline: base 87fa81b8 vs change, fixture spawn, USAGE_AXI_HOOK unset; nonces/repo root normalized ==
+claude: settings.local.json (Stop hook) identical; launch.log differed only by --add-dir '/privateROOT/.agents/skills' vs 'ROOT/.agents/skills' (base copy lived under /tmp, realpath /private/tmp - normalization artifact)
+codex: identical
+gemini: identical
+pi: identical
+
+== capture-enabled Gemini AfterAgent hook, executed with bash ==
+touch '/private/tmp/fmcmp-01M3/case-gemini/home/state/cmp-gemini-z1.turn-ended'; '/Users/andrewkim/.no-mistakes/worktrees/ebf490aaaabf/01M3YWFEKC8CJXS4JJ7WDJZHT1/bin/fm-busy-event.sh' apply '/private/tmp/fmcmp-01M3/case-gemini/home/state' 'cmp-gemini-z1' idle --gen 'g1790965605.43782.24223' --source gemini-hook --event after-agent >/dev/null 2>&1 || true; [ ! -x '/tmp/fmcmp-01M3/hk/capture hook' ] || '/tmp/fmcmp-01M3/hk/capture hook' '/tmp/fmcmp-01M3/case-gemini/home' 'cmp-gemini-z1' stop; printf '{}'
+
+stdout=[{}] exit=0; hook recorded: /tmp/fmcmp-01M3/case-gemini/home|cmp-gemini-z1|stop|argc=3
+
+== capture-enabled Pi extension, loaded under node and turn_end fired ==
+  pi.on("turn_end", () => execFile("touch", ["/private/tmp/fmcmp-01M3/case-pi/home/state/cmp-pi-z1.turn-ended"], () => execFile("bash", ["-c", "[ ! -x '/tmp/fmcmp-01M3/hk/capture hook' ] || '/tmp/fmcmp-01M3/hk/capture hook' '/tmp/fmcmp-01M3/case-pi/home' 'cmp-pi-z1' stop"])));
+registered: agent_start,agent_settled,turn_end; cmp-pi-z1.turn-ended created; hook recorded: /tmp/fmcmp-01M3/case-pi/home|cmp-pi-z1|stop|argc=3
