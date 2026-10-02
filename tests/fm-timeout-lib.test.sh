@@ -257,7 +257,7 @@ test_bounds_the_command_on_a_shell_without_bashpid() {
 # script's own parent: the parent outlives the teardown that killed the script,
 # so an owner read from it would leave the command running to its full bound.
 test_an_owner_that_dies_is_detected_without_bashpid() {
-  local dir watchdog started observed
+  local dir watchdog started observed pid
   dir="$TMP_ROOT/no-bashpid-owner"
   mkdir -p "$dir"
   # shellcheck disable=SC2016
@@ -267,7 +267,7 @@ test_an_owner_that_dies_is_detected_without_bashpid() {
     (
       printf "bashpid=[%s]\n" "${BASHPID:-}" > "$2/bashpid"
       while kill -0 "$$" 2>/dev/null; do sleep 0.05; done
-      fm_exec_timed 60 1 bash -c "exec sleep 300"
+      fm_exec_timed 60 1 bash -c "echo \$\$ > \"\$1\"; exec sleep 300" _ "$2/command"
     ) >/dev/null 2>&1 &
     echo "$!" > "$2/watchdog"
     exit 0
@@ -286,6 +286,10 @@ test_an_owner_that_dies_is_detected_without_bashpid() {
     fi
     sleep 0.02
   done
+  if [ -s "$dir/command" ]; then
+    pid=$(cat "$dir/command")
+    ! kill -0 "$pid" 2>/dev/null || fail "the bounded command outlived its owner on a shell without BASHPID"
+  fi
   pass "fm_exec_timed owns the bound by the calling script on a shell without BASHPID"
 }
 
