@@ -1,0 +1,23 @@
+### Lab project origin: fetch=https://github.com/kunchenguid/firstmate.git push=https://github.com/andrewkimcanidium/firstmate.git
+### brief.md (scaffold) CI witness contract sections: 0
+### ship-instructions.md CI witness contract sections: 1; class lines:
+CI destination class: fork-contribution
+### task metadata:
+ci_destination=fork-contribution
+### generated contract section:
+# Current CI witness contract
+CI destination class: fork-contribution
+This section supersedes the earlier requirement to report only CI green when a structural CI exception is verified.
+Scaffolding performs no destination lookup; dispatch or promotion classifies the explicit task project through origin's existing fetch/push URLs and the destination workflow inventory.
+An unclassified destination retains the ordinary CI gate until live evidence establishes a structural exception.
+Every controllable no-mistakes gate must pass; only CI can be recorded as not witnessed.
+At the CI gate or in the running CI monitor, if workflows are absent or the destination requires approval for this fork's workflows, report `needs-decision [at=<epoch>] [key=ci-witness]: PR {url} structural CI witness needed` to firstmate.
+Never skip or abort CI yourself or infer an exception from empty checks, elapsed time, pending checks, or a red or flaky check.
+When the CI gate is parked for a decision, firstmate uses `/Users/andrewkim/.no-mistakes/worktrees/ebf490aaaabf/01M46G4E2JVYWTF50CWM969WXM/bin/fm-ci-witness.sh ci-promoted {url} --skip` to verify live structural evidence and respond through the existing no-mistakes skip action; after the drive call returns a passing outcome, firstmate runs the same helper with `--record`.
+When the CI monitor is running, firstmate runs `--record` directly: it rechecks the published head, every controllable gate, and the structural evidence, records the witness, then ends the monitor with an explicit `no-mistakes axi abort`.
+The pipeline labels that run cancelled; the recorded witness, not that label, is the outcome, and the work is not abandoned.
+For an owned no-CI repository, report `done [at=<epoch>]: PR {url} CI absent` only after that witness is recorded; configured merge authority still approves landing.
+For a fork contribution, report `done [at=<epoch>]: PR {url} published, waiting on upstream` after the witness is recorded; the external hold records the maintainers' wait and is neither merged nor failed.
+A structural exception never authorizes merge or branch disposal; firstmate keeps merge monitoring and refuses cleanup until the work lands upstream.
+If CI runs, use the ordinary checks-green outcome; a fork PR still belongs to upstream maintainers, so firstmate records its published external hold with `--record` after all gates pass.
+Keep the pull request non-draft and commit nothing after the validated head was published.

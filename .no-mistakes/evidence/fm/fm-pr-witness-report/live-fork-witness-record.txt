@@ -1,0 +1,38 @@
+### A1 adversarial: review step skipped (not every controllable gate green) -> must refuse
+REFUSED: all controllable gates must have completed and CI must be at the required gate/outcome
+exit=1
+### A2 adversarial: wrong PR (6359) named for this worker -> must refuse
+REFUSED: no structural CI exception was witnessed; slow, pending, red and unreadable checks never qualify
+exit=1
+### Main: fork PR 6432, gates green, CI monitor running, upstream workflows action_required (real GitHub)
+witness: published, waiting on upstream; gates intent rebase review test document lint push pr passed; CI witnessed green; PR https://github.com/kunchenguid/firstmate/pull/6432; wait owned by destination maintainers
+exit=0
+### metadata:
+project=/tmp/fm-witness-lab.R0S8D6/fork
+ci_witness=green
+ci_witness_head=9efb7666739e7a80acdfec552f9e89ec02f30202
+ci_witness_report=published, waiting on upstream; gates intent rebase review test document lint push pr passed; CI witnessed green; PR https://github.com/kunchenguid/firstmate/pull/6432; wait owned by destination maintainers
+pr=https://github.com/kunchenguid/firstmate/pull/6432
+pr_head=9efb7666739e7a80acdfec552f9e89ec02f30202
+delivery_state=published
+### backlog row:
+task:
+  id: usage
+  title: "usage capture hooks https://github.com/kunchenguid/firstmate/pull/6432"
+  state: in_flight
+  blocked: no
+  blocked_by: none
+  held: yes
+  hold_reason: "published, waiting on upstream; gates intent rebase review test document lint push pr passed; CI witnessed green; PR https://github.com/kunchenguid/firstmate/pull/6432; wait owned by destination maintainers"
+  hold_kind: external
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-05
+  closed: "-"
+  deps: none
+  links: "pr:https://github.com/kunchenguid/firstmate/pull/6432"
+  body: ""
+### pipeline calls:
+(no respond)

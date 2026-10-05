@@ -1,0 +1,10 @@
+=== HEAD 63153d77 (as shipped), real gh-axi 0.1.35:
+history_rc=1
+CI destination unclassified: default-branch check history unreadable; ordinary CI gate retained
+unclassified
+=== Raw: gh-axi api graphql --field query=... (no method) returns:
+{"data":{"__schema":{"directives":[{"args":[{"defaultValue":"\"No longer supported\"","des...
+=== Scratch copy with 'POST graphql' (diagnostic only, not committed):
+never
+owned-no-ci
+carried

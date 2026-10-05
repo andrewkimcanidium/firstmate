@@ -1,0 +1,10 @@
+### Exact recorded witness run 01LIVEFORKRUN cancelled by the witness abort, worker done reported:
+state: done · source: status-log · PR https://github.com/kunchenguid/firstmate/pull/6432 published, waiting on upstream · CI witness recorded; run cancelled by the witness abort
+### Adversarial: a different cancelled run (02OTHER) on the same branch:
+state: unknown · source: run-step · run cancelled: no verdict
+### Adversarial: no worker done report (status says working):
+state: unknown · source: run-step · run cancelled: no verdict
+### Adversarial: worker copy moved to an unvalidated head after the witness:
+state: blocked · source: status-log · CI witness report does not bind the current named head
+### Adversarial: done report for a different PR:
+state: blocked · source: status-log · CI witness report does not name the verified pull request

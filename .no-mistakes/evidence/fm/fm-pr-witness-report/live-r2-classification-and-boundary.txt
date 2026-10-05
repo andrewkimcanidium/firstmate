@@ -1,0 +1,37 @@
+### Dispatch classification of explicit task projects (real GitHub API, current code):
+fork         origin=https://github.com/kunchenguid/firstmate.git push=https://github.com/andrewkimcanidium/firstmate.git -> fork-contribution 
+ownedci      origin=https://github.com/kunchenguid/firstmate.git push=https://github.com/kunchenguid/firstmate.git -> owned-ci 
+hello        origin=https://github.com/andrewkimcanidium/hello-world.git push=https://github.com/andrewkimcanidium/hello-world.git -> owned-no-ci 
+docs         origin=https://github.com/andrewkimcanidium/projector-api-docs.git push=https://github.com/andrewkimcanidium/projector-api-docs.git -> owned-ci 
+nm           origin=https://github.com/kunchenguid/no-mistakes.git push=https://github.com/kunchenguid/no-mistakes.git -> owned-ci 
+sap-cpq-axi  origin=https://github.com/CanidiumLLC/sap-cpq-axi.git push=https://github.com/CanidiumLLC/sap-cpq-axi.git -> owned-ci 
+wow          origin=https://github.com/kunchenguid/wow-combat-log-parser.git push=https://github.com/kunchenguid/wow-combat-log-parser.git -> owned-ci 
+(no project) -> CI destination unclassified: no explicit Git task project; ordinary CI gate retained unclassified 
+
+### Default-branch check history, owned no-CI repo andrewkimcanidium/hello-world (POST graphql):
+never
+rc=0
+
+### Multi-page history with real GitHub cursors (kunchenguid/wow-combat-log-parser, 182 commits, no rollups):
+never
+rc=0
+
+### Adversarial: owned repo WITH CI (kunchenguid/no-mistakes PR 1285, real checks) must not be recorded absent:
+head=19c709682717a764afd3fbe0df311e300d93d8e3
+ci_not_witnessed rc=1 (non-zero = refused)
+
+### Adversarial: fork PR 6432 at a stale head must not be witnessed:
+rc=1
+### Adversarial: fork PR 6432 assessed from an owned-shaped project (fetch=push upstream) must not be recorded absent:
+rc=1
+### Fork PR 6432 at its published head (structural witness):
+awaiting-destination-approval
+rc=0
+### Adversarial: green third-party check beside action_required upstream runs must not count as CI green:
+pr_ci_green rc=1 (non-zero = not green)
+
+### Multi-page paging trace (request log on stderr), kunchenguid/wow-combat-log-parser:
+  page request: first
+  page request with cursor: after=905807d9fd755c47178c2adfa7c1474bd7dcb763 99
+never
+rc=0

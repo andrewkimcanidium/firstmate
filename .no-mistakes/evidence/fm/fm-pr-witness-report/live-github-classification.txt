@@ -1,0 +1,12 @@
+fork     class=fork-contribution 
+ownedci  class=owned-ci 
+hello    class=CI destination unclassified: default-branch check history unreadable; ordinary CI gate retained unclassified 
+docs     class=owned-ci 
+class(empty)=CI destination unclassified: no explicit Git task project; ordinary CI gate retained unclassified 
+--- fork PR 6432 structural witness (real GitHub):
+awaiting-destination-approval
+rc=0
+--- fork PR 6432 at a stale/wrong head (adversarial):
+rc=1
+--- fork PR 6359 (different PR, using 6432 copy, adversarial):
+rc=1
