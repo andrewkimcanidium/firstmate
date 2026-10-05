@@ -5,7 +5,8 @@
 # structural evidence, then responds only to the awaiting CI gate with skip.
 # --record requires a passing run whose CI is skipped with that same structural
 # proof (or completed green on a fork), or a running CI monitor: green on a fork,
-# otherwise structurally unwitnessed. It records the witness on task metadata and
+# otherwise structurally unwitnessed. Green needs the destination's own completed
+# workflow runs at the head; absence covers an owned or fork destination alike. It records the witness on task metadata and
 # holds a published contribution externally through fm-backlog-transition-lib.
 # A structurally unwitnessed running monitor is then ended with an explicit
 # `no-mistakes axi abort --run <id>`, the only way the pipeline ends a monitor
@@ -93,11 +94,12 @@ case "$OUTCOME:$CI" in
   *) refuse 'pipeline has no passing outcome or witnessed-green CI-ready monitor' ;;
 esac
 if [ "$CLASS" = fork-contribution ]; then
-  REASON="published, waiting on upstream; gates intent rebase review test document lint push pr passed; CI witnessed green"
-  [ "$WITNESS" = green ] || REASON="published, waiting on upstream; gates intent rebase review test document lint push pr passed; CI not witnessed"
-  if [ "$WITNESS" != green ]; then
-    REASON="$REASON - destination withholds fork workflows pending maintainer approval"
-  fi
+  REASON="published, waiting on upstream; gates intent rebase review test document lint push pr passed; CI"
+  case "$WITNESS" in
+    green) REASON="$REASON witnessed green" ;;
+    absent) REASON="$REASON not witnessed - absent: destination has no configured workflows or checks, and none ever on its default branch" ;;
+    *) REASON="$REASON not witnessed - destination withholds fork workflows pending maintainer approval" ;;
+  esac
   REASON="$REASON; PR $URL; wait owned by destination maintainers$ABORT"
 else
   [ "$WITNESS" = absent ] || refuse 'owned repository must use its ordinary green CI path'

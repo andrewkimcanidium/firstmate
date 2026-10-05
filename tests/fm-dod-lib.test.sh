@@ -653,6 +653,44 @@ test_ci_witness_ends_a_running_monitor_only_for_structural_causes() {
   pass 'a running CI monitor ends with an honest witness only for structural causes'
 }
 
+test_ci_witness_green_needs_destination_workflow_runs() {
+  local fork out
+  fork=$(make_ci_case app-check-only fork 1)
+  ci_edit "$fork" checks '.total_count=1 | .check_runs=[{name:"Greptile Review",status:"completed",conclusion:"success"}]'
+  ci_edit "$fork" runs '.total_count=0 | .workflow_runs=[]'
+  write_ci_run "$fork" running ''
+  if out=$(ci_command "$fork" --record 2>&1); then fail "an app check without destination workflow runs recorded: $out"; fi
+  assert_no_grep 'ci_witness=' "$fork/state/witness.meta" 'an app check alone recorded a witness'
+  assert_absent "$fork/aborted" 'an app check alone ended the CI monitor'
+  write_ci_run "$fork" completed passed
+  if ci_command "$fork" --record >/dev/null 2>&1; then fail 'a passed run with only an app check was recorded green'; fi
+  assert_no_grep 'ci_witness=green' "$fork/state/witness.meta" 'an app check alone recorded green'
+  ci_edit "$fork" runs '.total_count=1 | .workflow_runs=[{head_sha:"'"$(git -C "$fork/wt" rev-parse HEAD)"'",status:"completed",conclusion:"skipped"}]'
+  if ci_command "$fork" --record >/dev/null 2>&1; then fail 'only skipped destination workflow runs were recorded green'; fi
+  ci_edit "$fork" runs '.workflow_runs[0].conclusion="success"'
+  out=$(ci_command "$fork" --record) || fail "a successful destination workflow run was refused: $out"
+  assert_grep 'ci_witness=green' "$fork/state/witness.meta" 'destination workflow success was not recorded green'
+  pass 'a green witness needs the destination'"'"'s own successful workflow runs, never an app check alone'
+}
+
+test_ci_witness_fork_destination_without_ci() {
+  local fork out row
+  fork=$(make_ci_case fork-no-ci fork 0)
+  ci_edit "$fork" runs '.total_count=0 | .workflow_runs=[]'
+  [ "$(ci_assess "$fork")" = absent ] || fail 'a fork destination without CI did not record absence'
+  write_ci_run "$fork" running ''
+  out=$(ci_command "$fork" --record) || fail "a fork destination without CI could not finish: $out"
+  assert_contains "$out" 'CI not witnessed - absent' 'fork absence was not stated'
+  assert_grep 'ci_witness=absent' "$fork/state/witness.meta" 'fork absence witness not recorded'
+  assert_grep 'delivery_state=published' "$fork/state/witness.meta" 'fork without CI was not published'
+  assert_grep 'axi abort --run witness-run' "$fork/aborted" 'fork no-CI monitor was left to time out'
+  row=$(tasks-axi show witness --file "$fork/data/backlog.md")
+  assert_contains "$row" 'hold_kind: external' 'fork without CI did not take the external hold'
+  ci_edit "$fork" history '.data.repository.defaultBranchRef.target.history.nodes[0].statusCheckRollup={state:"SUCCESS"}'
+  if ci_assess "$fork" >/dev/null; then fail 'a fork whose default branch carried checks was treated as absent'; fi
+  pass 'a fork destination that never carried CI records absence and takes the external hold'
+}
+
 test_ci_witness_ledger_refuses_uncontrolled_skips() {
   local case_dir
   case_dir=$(make_ci_case ledger owned 0)
@@ -712,5 +750,7 @@ test_ci_destination_classes_and_refusals
 test_ci_witness_skip_record_and_publication
 test_ci_witness_ends_a_running_monitor_only_for_structural_causes
 test_ci_witness_ledger_refuses_uncontrolled_skips
+test_ci_witness_green_needs_destination_workflow_runs
+test_ci_witness_fork_destination_without_ci
 
 echo "all fm-dod-lib tests passed"

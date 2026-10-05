@@ -273,9 +273,11 @@ fm_dod_nm_witness_gates() {  # <axi-status> <ci-status>
 }
 
 # The ordinary witnessed-green fork ready point need not wait for the pipeline's
-# merge monitor to end. It still needs positive CI at this exact open PR head.
-# A green third-party check is not CI while the destination's own workflow runs
-# at that head still await approval or are pending.
+# merge monitor to end. It still needs positive CI at this exact open PR head:
+# the destination's own workflow runs at that head, at least one of them
+# successful and every one completed without failure. A check or status from any
+# other app is never destination CI, and an empty run list is absence of
+# evidence, never success.
 fm_dod_pr_ci_green() {  # <PR-url> <head>
   local url=$1 head=$2 path number pr checks statuses runs
   fm_pr_url_parse "$url" && [ "$FM_PR_PROVIDER" = github ] && [ "$FM_PR_HOST" = github.com ] || return 1
@@ -291,20 +293,42 @@ fm_dod_pr_ci_green() {  # <PR-url> <head>
   printf '%s' "$statuses" | jq -e '
     (.total_count == (.statuses | length)) and all(.statuses[]; .state == "success")' >/dev/null || return 1
   runs=$(fm_dod_api_json "repos/$path/actions/runs?head_sha=$head&per_page=100") || return 1
-  printf '%s' "$runs" | jq -e '
-    (.total_count == (.workflow_runs | length)) and all(.workflow_runs[];
-      .status == "completed" and (.conclusion == "success" or .conclusion == "neutral" or .conclusion == "skipped"))' >/dev/null || return 1
-  [ "$(printf '%s' "$checks" | jq '.total_count')" -gt 0 ] \
-    || [ "$(printf '%s' "$statuses" | jq '.total_count')" -gt 0 ]
+  printf '%s' "$runs" | jq -e --arg head "$head" '
+    (.total_count == (.workflow_runs | length))
+    and all(.workflow_runs[]; .head_sha == $head and .status == "completed"
+      and (.conclusion == "success" or .conclusion == "neutral" or .conclusion == "skipped"))
+    and any(.workflow_runs[]; .conclusion == "success")' >/dev/null
+}
+
+# CI is absent from a destination, owned or fork alike, only with no check or
+# status at the head, no workflows, a default branch that has never carried a
+# check or status, and no required check on the PR's base branch.
+fm_dod_ci_absent() {  # <owner/repo> <PR-json> <head-check-runs-json> <head-statuses-json>
+  local path=$1 pr=$2 checks=$3 statuses=$4 workflows base branch rules
+  printf '%s' "$checks" | jq -e '.total_count == 0 and .check_runs == []' >/dev/null \
+    && printf '%s' "$statuses" | jq -e '.total_count == 0 and .statuses == []' >/dev/null || return 1
+  workflows=$(fm_dod_api_json "repos/$path/actions/workflows?per_page=100") || return 1
+  printf '%s' "$workflows" | jq -e '.total_count == 0 and .workflows == []' >/dev/null || return 1
+  [ "$(fm_dod_default_branch_checks "$path")" = never ] || return 1
+  base=$(printf '%s' "$pr" | jq -er '.base.ref | @uri') || return 1
+  branch=$(fm_dod_api_json "repos/$path/branches/$base") || return 1
+  printf '%s' "$branch" | jq -e '
+    .protected == false or (.protected == true and (.protection | type) == "object"
+      and (.protection.required_status_checks | type) == "object"
+      and (.protection.required_status_checks.contexts == [])
+      and ((.protection.required_status_checks.checks // []) == []))' >/dev/null || return 1
+  rules=$(fm_dod_api_json "repos/$path/rules/branches/$base") || return 1
+  printf '%s' "$rules" | jq -e 'type == "array" and all(.[]; .type != "required_status_checks")' >/dev/null
 }
 
 # Prints absent or awaiting-destination-approval on verified structural evidence.
-# Absent also requires a default branch that has never carried a check or status.
+# Without positive absence, only a fork qualifies, through its approval-required
+# workflow runs.
 # PR identity, current head, open/non-draft state, complete check inventories and
 # the approval-required workflow all bind to the same destination and head.
 # Red, incomplete, pending or unknown observations refuse, even on a fork.
 fm_dod_ci_not_witnessed() {  # <repository> <canonical-PR-url> <expected-head>
-  local repo=$1 url=$2 head=$3 fetch push path number pr workflows checks statuses runs base branch rules head_branch
+  local repo=$1 url=$2 head=$3 fetch push path number pr checks statuses runs head_branch
   fm_pr_url_parse "$url" && [ "$FM_PR_PROVIDER" = github ] && [ "$FM_PR_HOST" = github.com ] || return 1
   path=$FM_PR_PATH number=$FM_PR_NUMBER
   fetch=$(fm_dod_github_repo "$(git -C "$repo" remote get-url origin)") || return 1
@@ -317,23 +341,8 @@ fm_dod_ci_not_witnessed() {  # <repository> <canonical-PR-url> <expected-head>
     and (.head.repo.full_name | ascii_downcase) == $push' >/dev/null || return 1
   checks=$(fm_dod_api_json "repos/$path/commits/$head/check-runs?per_page=100") || return 1
   statuses=$(fm_dod_api_json "repos/$path/commits/$head/status?per_page=100") || return 1
-  if [ "$fetch" = "$push" ]; then
-    workflows=$(fm_dod_api_json "repos/$path/actions/workflows?per_page=100") || return 1
-    [ "$(fm_dod_default_branch_checks "$path")" = never ] || return 1
-    printf '%s' "$workflows" | jq -e '.total_count == 0 and .workflows == []' >/dev/null \
-      && printf '%s' "$checks" | jq -e '.total_count == 0 and .check_runs == []' >/dev/null \
-      && printf '%s' "$statuses" | jq -e '.total_count == 0 and .statuses == []' >/dev/null || return 1
-    base=$(printf '%s' "$pr" | jq -er '.base.ref | @uri') || return 1
-    branch=$(fm_dod_api_json "repos/$path/branches/$base") || return 1
-    printf '%s' "$branch" | jq -e '
-      .protected == false or (.protected == true and (.protection | type) == "object"
-        and (.protection.required_status_checks | type) == "object"
-        and (.protection.required_status_checks.contexts == [])
-        and ((.protection.required_status_checks.checks // []) == []))' >/dev/null || return 1
-    rules=$(fm_dod_api_json "repos/$path/rules/branches/$base") || return 1
-    printf '%s' "$rules" | jq -e 'type == "array" and all(.[]; .type != "required_status_checks")' >/dev/null || return 1
-    echo absent; return 0
-  fi
+  if fm_dod_ci_absent "$path" "$pr" "$checks" "$statuses"; then echo absent; return 0; fi
+  [ "$fetch" != "$push" ] || return 1
   printf '%s' "$checks" | jq -e '
     (.total_count == (.check_runs | length)) and all(.check_runs[];
       .status == "completed" and (.conclusion == "success" or .conclusion == "neutral" or .conclusion == "skipped" or .conclusion == "action_required"))' >/dev/null || return 1
