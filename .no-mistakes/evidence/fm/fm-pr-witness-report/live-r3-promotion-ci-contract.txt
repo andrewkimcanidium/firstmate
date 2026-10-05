@@ -1,0 +1,19 @@
+### code under test: e42943c435d60f08b0d4a8d51a77e5fc6bf0f9fd
+
+### fork: origin fetch=https://github.com/kunchenguid/firstmate.git push=https://github.com/andrewkimcanidium/firstmate.git
+brief.md (scaffold) CI witness contract sections: 0
+promote exit=0
+ship-instructions.md CI witness contract sections: 1; class lines: CI destination class: fork-contribution;
+task metadata: ci_destination=fork-contribution
+
+### hello: origin fetch=https://github.com/andrewkimcanidium/hello-world.git push=https://github.com/andrewkimcanidium/hello-world.git
+brief.md (scaffold) CI witness contract sections: 0
+promote exit=0
+ship-instructions.md CI witness contract sections: 1; class lines: CI destination class: owned-no-ci;
+task metadata: ci_destination=owned-no-ci
+
+### nm: origin fetch=https://github.com/kunchenguid/no-mistakes.git push=https://github.com/kunchenguid/no-mistakes.git
+brief.md (scaffold) CI witness contract sections: 0
+promote exit=0
+ship-instructions.md CI witness contract sections: 1; class lines: CI destination class: owned-ci;
+task metadata: ci_destination=owned-ci
