@@ -377,7 +377,10 @@ STUB
     brief_dod="$TMP_ROOT/promote-dod/brief-dod-$id"
     delivered_dod="$TMP_ROOT/promote-dod/delivered-dod-$id"
     awk '/^# Definition of done$/ { emit=1 } emit' "$home/data/$id/brief.md" > "$brief_dod"
-    awk '/^# Definition of done$/ { emit=1 } emit' "$payload" > "$delivered_dod"
+    # Live promotion instructions append the classified CI witness contract that
+    # spawn appends for an ordinary brief; the Definitions of done precede it.
+    awk '/^# Current CI witness contract$/ { exit } /^# Definition of done$/ { emit=1 } emit' "$payload" \
+      | sed '${/^$/d;}' > "$delivered_dod"
     cmp -s "$brief_dod" "$delivered_dod" \
       || fail "$mode: promotion and ordinary brief generation delivered different Definitions of done"
   done
@@ -1661,6 +1664,8 @@ EOF
   out=$(run_spawn "$home" "$fakebin" "$id" "$proj" claude --mode no-mistakes --yolo off)
   assert_grep 'CI destination class: fork-contribution' "$home/data/$id/launch-brief.md" \
     'spawn classified the scaffold name instead of its actual project'
+  [ "$(grep -c '^# Current CI witness contract$' "$home/data/$id/launch-brief.md")" = 1 ] \
+    || fail 'launch brief carries more than one CI witness contract'
   id=ci-bound-promoted
   printf 'window=fm-%s\nkind=scout\nworktree=/tmp/wt\nproject=%s\n' "$id" "$proj" > "$home/state/$id.meta"
   FM_HOME="$home" "$BRIEF" "$id" unrelated-scaffold-name --scout >/dev/null
@@ -1670,6 +1675,8 @@ EOF
   assert_grep 'CI destination class: fork-contribution' "$home/data/$id/ship-instructions.md" \
     'promotion did not classify the project in task metadata'
   assert_grep 'ci_destination=fork-contribution' "$home/state/$id.meta" 'promotion omitted destination metadata'
+  assert_no_grep 'Current CI witness contract' "$home/data/$id/brief.md" \
+    'promoted relaunch brief carries a CI contract spawn would duplicate'
   pass 'spawn and promotion classify the explicit task project through the same entry point'
 }
 

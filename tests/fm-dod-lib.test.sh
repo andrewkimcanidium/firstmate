@@ -423,6 +423,7 @@ EOF
   done
   pass "promotion keeps a scout's recorded base branch and refuses local-only for it"
 }
+
 # These fixtures exercise the public witness gate and its CLI using the exact
 # scalar API envelope gh-axi exposes. No real forge or pipeline is mutated.
 make_ci_case() {  # <name> <owned|fork> <workflow-count>
@@ -442,6 +443,7 @@ import json, pathlib, sys
 p, head, push, count = sys.argv[1:]
 p = pathlib.Path(p)
 fixtures = {
+ 'history': {'data':{'repository':{'defaultBranchRef':{'target':{'history':{'pageInfo':{'hasNextPage':False,'endCursor':None},'nodes':[{'statusCheckRollup':None}]}}}}}},
  'pr': {'state':'open','draft':False,'head':{'sha':head,'ref':'fm/witness','repo':{'full_name':push}},'base':{'ref':'main','repo':{'full_name':'owner/repo'}}},
  'workflows': {'total_count':int(count),'workflows':[{'id':i} for i in range(int(count))]},
  'checks': {'total_count':0,'check_runs':[]},
@@ -458,7 +460,8 @@ PYFIX
 import base64, os, pathlib, sys
 p = pathlib.Path(os.environ['WITNESS_FIXTURE'])
 path = sys.argv[2]
-if '/pulls/' in path: name='pr'
+if path == 'graphql': name='history'
+elif '/pulls/' in path: name='pr'
 elif '/workflows?' in path: name='workflows'
 elif '/check-runs?' in path: name='checks'
 elif '/status?' in path: name='statuses'
@@ -474,6 +477,7 @@ FAKE
 case "$1 $2" in
   'axi status') cat "$WITNESS_FIXTURE/run.toon" ;;
   'axi respond') printf '%s\n' "$*" >> "$WITNESS_FIXTURE/responded" ;;
+  'axi abort') printf '%s\n' "$*" >> "$WITNESS_FIXTURE/aborted" ;;
   *) exit 1 ;;
 esac
 FAKE
@@ -540,6 +544,13 @@ test_ci_destination_classes_and_refusals() {
   ci_edit "$fork" runs '.workflow_runs[0].conclusion=null | .workflow_runs[0].status="queued"'
   if ci_assess "$fork" >/dev/null; then fail 'a slow fork check qualified without structural approval evidence'; fi
   ci_edit "$no_ci" statuses '.total_count=0 | .statuses=[]'
+  ci_edit "$no_ci" history '.data.repository.defaultBranchRef.target.history.nodes[0].statusCheckRollup={state:"SUCCESS"}'
+  [ "$(ci_class "$no_ci")" = owned-ci ] || fail 'historical default-branch checks did not mark CI configured'
+  if ci_assess "$no_ci" >/dev/null; then fail 'a not-yet-reported check with history was treated as absent'; fi
+  ci_edit "$no_ci" history '.data.repository.defaultBranchRef.target.history.nodes[0].statusCheckRollup=null | .data.repository.defaultBranchRef.target.history.pageInfo={hasNextPage:true,endCursor:"bad cursor"}'
+  [ "$(ci_class "$no_ci")" = unclassified ] || fail 'incomplete check history was classified'
+  if ci_assess "$no_ci" >/dev/null; then fail 'incomplete check history proved absence'; fi
+  ci_edit "$no_ci" history '.data.repository.defaultBranchRef.target.history.pageInfo={hasNextPage:false,endCursor:null}'
   ci_edit "$no_ci" rules '[{type:"required_status_checks",parameters:{required_status_checks:[{context:"required CI"}]}}]'
   if ci_assess "$no_ci" >/dev/null; then fail 'unreported required CI was treated as absent'; fi
   touch "$owned/api-error"
@@ -583,6 +594,35 @@ test_ci_witness_skip_record_and_publication() {
     'done: PR https://github.com/owner/repo/pull/1 published, waiting on upstream' \
     "$fork/state" witness "$fork/state/witness.meta" >/dev/null; then fail 'stale witness covered an unvalidated head'; fi
   pass 'verified skips, honest records, external publication and named-head custody'
+}
+
+test_ci_witness_ends_a_running_monitor_only_for_structural_causes() {
+  local no_ci fork owned out
+  fork=$(make_ci_case running-fork fork 1)
+  write_ci_run "$fork" running ''
+  if ci_command "$fork" --skip >/dev/null 2>&1; then fail 'skip answered a running monitor'; fi
+  out=$(ci_command "$fork" --record) || fail "running fork monitor awaiting approval was refused: $out"
+  assert_grep 'axi abort --run witness-run' "$fork/aborted" 'structural fork monitor was not ended'
+  assert_contains "$out" 'destination withholds fork workflows pending maintainer approval' 'structural reason missing'
+  assert_contains "$out" 'pipeline records that run as cancelled, not abandoned' 'cancelled label not explained'
+  assert_grep 'delivery_state=published' "$fork/state/witness.meta" 'running fork was not published'
+  no_ci=$(make_ci_case running-absent owned 0)
+  write_ci_run "$no_ci" running ''
+  out=$(ci_command "$no_ci" --record) || fail "running owned no-CI monitor was refused: $out"
+  assert_grep 'axi abort --run witness-run' "$no_ci/aborted" 'no-CI monitor was not ended'
+  assert_contains "$out" 'CI not witnessed - absent' 'absence was not stated'
+  assert_grep 'ci_witness=absent' "$no_ci/state/witness.meta" 'absence witness not recorded'
+  owned=$(make_ci_case running-owned owned 0)
+  write_ci_run "$owned" running ''
+  ci_edit "$owned" history '.data.repository.defaultBranchRef.target.history.nodes[0].statusCheckRollup={state:"PENDING"}'
+  if ci_command "$owned" --record >/dev/null 2>&1; then fail 'slow configured CI ended its monitor'; fi
+  assert_absent "$owned/aborted" 'slow configured CI was aborted'
+  assert_no_grep 'ci_witness=' "$owned/state/witness.meta" 'slow configured CI recorded a witness'
+  ci_edit "$fork" runs '.workflow_runs[0].conclusion=null | .workflow_runs[0].status="queued"'
+  rm -f "$fork/aborted"
+  if ci_command "$fork" --record >/dev/null 2>&1; then fail 'slow fork CI ended its monitor'; fi
+  assert_absent "$fork/aborted" 'slow fork CI was aborted'
+  pass 'a running CI monitor ends with an honest witness only for structural causes'
 }
 
 test_ci_witness_ledger_refuses_uncontrolled_skips() {
@@ -642,6 +682,7 @@ test_worker_role_names_skill_and_fallback_file() {
 test_worker_role_names_skill_and_fallback_file
 test_ci_destination_classes_and_refusals
 test_ci_witness_skip_record_and_publication
+test_ci_witness_ends_a_running_monitor_only_for_structural_causes
 test_ci_witness_ledger_refuses_uncontrolled_skips
 
 echo "all fm-dod-lib tests passed"

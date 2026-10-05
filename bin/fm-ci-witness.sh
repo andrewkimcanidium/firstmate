@@ -3,11 +3,16 @@
 # Usage: fm-ci-witness.sh <task-id> <GitHub-PR-url> --skip|--record
 # --skip verifies the live PR/head, all controllable no-mistakes gates and the
 # structural evidence, then responds only to the awaiting CI gate with skip.
-# --record requires a passing run, or a witnessed-green fork CI-ready monitor,
-# whose CI is skipped with that same structural
-# proof (or completed on a fork), records the witness on task metadata, and
+# --record requires a passing run whose CI is skipped with that same structural
+# proof (or completed green on a fork), or a running CI monitor: green on a fork,
+# otherwise structurally unwitnessed. It records the witness on task metadata and
 # holds a published contribution externally through fm-backlog-transition-lib.
-# Re-run --record after interruption to finish a metadata/hold pairing.
+# A structurally unwitnessed running monitor is then ended with an explicit
+# `no-mistakes axi abort --run <id>`, the only way the pipeline ends a monitor
+# short of merge or close. The pipeline records that run's outcome as cancelled;
+# the witness on task metadata, not that label, carries the truth: every
+# controllable gate passed and CI was structurally not witnessed, not abandoned.
+# Re-run --record after interruption to finish a metadata/hold/abort sequence.
 # Origin fetch/push URLs and the API are re-read rather than trusting the
 # dispatch hint or a worker's report. Unknown, pending and failing CI refuse.
 # This script never merges, closes a task, or removes its worktree/endpoint.
@@ -54,19 +59,25 @@ RUN=$(cd "$WT" && no-mistakes axi status) || refuse 'cannot read pipeline eviden
 RUN_HEAD=$(fm_nm_branch_sync_nested "$RUN" pipeline current_head)
 [ -n "$RUN_HEAD" ] || RUN_HEAD=$(fm_nm_strip_quotes "$(fm_nm_field "$RUN" head_sha)")
 [ "$RUN_HEAD" = "$HEAD" ] || refuse 'pipeline head does not match worker head'
+RUN_ID=$(fm_nm_strip_quotes "$(fm_nm_field "$RUN" id)")
 CI=skipped
-if [ "$ACTION" = --skip ]; then CI=awaiting_approval; fi
-if [ "$ACTION" = --record ] && [ "$CLASS" = fork-contribution ] \
-  && fm_dod_nm_witness_gates "$RUN" completed; then CI=completed
-elif [ "$ACTION" = --record ] && [ "$CLASS" = fork-contribution ] \
-  && fm_dod_nm_witness_gates "$RUN" running; then CI=running
+if [ "$ACTION" = --skip ]; then CI=awaiting_approval
+elif fm_dod_nm_witness_gates "$RUN" running; then CI=running
+elif [ "$CLASS" = fork-contribution ] && fm_dod_nm_witness_gates "$RUN" completed; then CI=completed
 fi
 fm_dod_nm_witness_gates "$RUN" "$CI" || refuse 'all controllable gates must have completed and CI must be at the required gate/outcome'
-if [ "$CI" = completed ] || [ "$CI" = running ]; then
+if [ "$CI" = completed ]; then
   fm_dod_pr_ci_green "$URL" "$HEAD" || refuse 'CI is not witnessed green at the open published head'
+  WITNESS=green
+elif [ "$CI" = running ] && [ "$CLASS" = fork-contribution ] && fm_dod_pr_ci_green "$URL" "$HEAD"; then
   WITNESS=green
 else
   WITNESS=$(fm_dod_ci_not_witnessed "$WT" "$URL" "$HEAD") || refuse 'no structural CI exception was witnessed; slow, pending, red and unreadable checks never qualify'
+fi
+ABORT=
+if [ "$CI" = running ] && [ "$WITNESS" != green ]; then
+  case "$RUN_ID" in ''|*[!A-Za-z0-9._-]*) refuse 'cannot identify the running CI monitor' ;; esac
+  ABORT="; no-mistakes run $RUN_ID CI monitor ended by explicit abort, so the pipeline records that run as cancelled, not abandoned"
 fi
 if [ "$ACTION" = --skip ]; then
   # Only this verified action reaches the third-party pipeline. Its return owns
@@ -87,10 +98,10 @@ if [ "$CLASS" = fork-contribution ]; then
   if [ "$WITNESS" != green ]; then
     REASON="$REASON - destination withholds fork workflows pending maintainer approval"
   fi
-  REASON="$REASON; PR $URL; wait owned by destination maintainers"
+  REASON="$REASON; PR $URL; wait owned by destination maintainers$ABORT"
 else
   [ "$WITNESS" = absent ] || refuse 'owned repository must use its ordinary green CI path'
-  REASON="gates intent rebase review test document lint push pr passed; CI not witnessed - absent: no configured workflows or checks; PR $URL; awaiting configured merge authority"
+  REASON="gates intent rebase review test document lint push pr passed; CI not witnessed - absent: no configured workflows or checks, and none ever on the default branch; PR $URL; awaiting configured merge authority$ABORT"
 fi
 # Stage a recoverable witness before the backlog transition. Repeating --record
 # rechecks all evidence and reapplies the same external hold if it was interrupted.
@@ -109,5 +120,8 @@ if [ "$CLASS" = fork-contribution ]; then
     [ "$RESULT" = 1 ] || refuse "$FM_BACKLOG_TRANSITION_ERROR"
     echo "Manual backlog: hold $ID externally with witness: $REASON"
   fi
+fi
+if [ -n "$ABORT" ]; then
+  (cd "$WT" && no-mistakes axi abort --run "$RUN_ID") >&2 || refuse 'witness recorded but the CI monitor did not end - rerun --record'
 fi
 printf 'witness: %s\n' "$REASON"

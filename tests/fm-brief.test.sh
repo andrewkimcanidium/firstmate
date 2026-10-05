@@ -1484,9 +1484,9 @@ SH
     "$ROOT/bin/fm-brief.sh" ci-scaffold fork-project --mode no-mistakes >/dev/null \
     || fail 'offline scaffolding failed'
   assert_absent "$marker" 'brief scaffolding looked up destination workflows'
-  assert_grep 'CI destination class: unclassified' "$home/data/ci-scaffold/brief.md" \
-    'scaffolding classified an unresolved project before dispatch'
-  pass 'brief scaffolding is offline and defers project destination classification to dispatch'
+  assert_no_grep 'Current CI witness contract' "$home/data/ci-scaffold/brief.md" \
+    'scaffolding wrote a CI contract that dispatch would duplicate'
+  pass 'brief scaffolding is offline and defers the CI witness contract to dispatch'
 }
 
 

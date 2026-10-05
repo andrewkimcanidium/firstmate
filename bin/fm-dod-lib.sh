@@ -137,9 +137,9 @@ fm_dod_github_repo() {  # <remote-url>
 
 # gh-axi renders API results as TOON. Ask it for a base64-encoded JSON scalar,
 # then decode only its non-truncated body, avoiding rendered array/table parsing.
-fm_dod_api_json() {  # <GitHub REST path>
+fm_dod_api_json() {  # <GitHub REST path | graphql --field query=...>
   local out body
-  out=$(fm_run_timed 15 gh-axi api "$1" --full --jq 'tojson | @base64') || return 1
+  out=$(fm_run_timed 15 gh-axi api "$@" --full --jq 'tojson | @base64') || return 1
   [ "$(printf '%s\n' "$out" | sed -n 's/^  truncated: //p')" = false ] || return 1
   body=$(printf '%s\n' "$out" | sed -n 's/^  body: //p')
   case "$body" in ''|*[!A-Za-z0-9+/=]*) return 1 ;; esac
@@ -151,9 +151,38 @@ fm_dod_api_json() {  # <GitHub REST path>
   '
 }
 
+# CI absence needs positive history, never one empty instant: a default branch
+# that has ever carried a check run or commit status has CI configured, however
+# slowly it reports now. Prints never only after reading the complete history,
+# carried on the first rollup found; unreadable or malformed history fails.
+fm_dod_default_branch_checks() {  # <owner/repo>
+  local owner=${1%%/*} name=${1#*/} after=null page state
+  while :; do
+    page=$(fm_dod_api_json graphql --field "query=query{repository(owner:\"$owner\",name:\"$name\"){defaultBranchRef{target{...on Commit{history(first:100,after:$after){pageInfo{hasNextPage endCursor}nodes{statusCheckRollup{state}}}}}}}}") || return 1
+    state=$(printf '%s' "$page" | jq -r '.data.repository.defaultBranchRef.target.history
+      | if (.nodes | type) != "array" or (.pageInfo.hasNextPage | type) != "boolean" then "bad"
+        elif any(.nodes[]; .statusCheckRollup != null) then "carried"
+        elif .pageInfo.hasNextPage then "next:" + (.pageInfo.endCursor // "")
+        else "never" end') || return 1
+    case "$state" in
+      carried|never) echo "$state"; return 0 ;;
+      next:*) after=${state#next:} ;;
+      *) return 1 ;;
+    esac
+    case "$after" in ''|*[!A-Za-z0-9+/=_:-]*) return 1 ;; esac
+    after="\"$after\""
+  done
+}
+
 # Classify only an explicit task project at dispatch/promotion. Scaffolding
-# carries unclassified instructions and performs no network read. In particular,
+# performs no network read and carries no CI contract. In particular,
 # git -C "" is forbidden: Git interprets it as the caller's checkout.
+# Someone else's repository is proxied by origin fetch differing from push, with
+# no ownership lookup. Limit: a repository we own but push through a personal
+# fork is classified fork-contribution, so it is held externally and refused at
+# cleanup until it lands upstream - it stalls loudly rather than losing work.
+# An owned repository is owned-no-ci only with no Actions workflows and a
+# default branch that has never carried a check run or commit status.
 fm_dod_destination_class() {  # <explicit-task-project-path>
   local repo=$1 fetch push workflows
   if [ -z "$repo" ] || [ ! -d "$repo" ] || ! git -C "$repo" rev-parse --git-dir >/dev/null 2>&1; then
@@ -172,7 +201,13 @@ fm_dod_destination_class() {  # <explicit-task-project-path>
     echo unclassified; return
   fi
   if printf '%s' "$workflows" | jq -e '.total_count == 0 and .workflows == []' >/dev/null; then
-    echo owned-no-ci
+    case "$(fm_dod_default_branch_checks "$fetch")" in
+      never) echo owned-no-ci ;;
+      carried) echo owned-ci ;;
+      *)
+        echo 'CI destination unclassified: default-branch check history unreadable; ordinary CI gate retained' >&2
+        echo unclassified ;;
+    esac
   elif printf '%s' "$workflows" | jq -e '(.total_count | type) == "number" and .total_count > 0 and (.workflows | type) == "array"' >/dev/null; then
     echo owned-ci
   else
@@ -195,10 +230,11 @@ This section supersedes the earlier requirement to report only CI green when a s
 Scaffolding performs no destination lookup; dispatch or promotion classifies the explicit task project through origin's existing fetch/push URLs and the destination workflow inventory.
 An unclassified destination retains the ordinary CI gate until live evidence establishes a structural exception.
 Every controllable no-mistakes gate must pass; only CI can be recorded as not witnessed.
-At the CI gate, if workflows are absent or the destination requires approval for this fork's workflows, report \`needs-decision [at=<epoch>] [key=ci-witness]: PR {url} structural CI witness needed\` to firstmate.
-Never skip CI yourself or infer an exception from empty checks, elapsed time, pending checks, or a red or flaky check.
-Firstmate uses \`$root/bin/fm-ci-witness.sh $id {url} --skip\` to verify live structural evidence and respond to the CI gate through the existing no-mistakes skip action.
-After the drive call returns a passing outcome, firstmate runs the same helper with \`--record\`; it rechecks the published head, every controllable gate, and the structural evidence before recording the witness.
+At the CI gate or in the running CI monitor, if workflows are absent or the destination requires approval for this fork's workflows, report \`needs-decision [at=<epoch>] [key=ci-witness]: PR {url} structural CI witness needed\` to firstmate.
+Never skip or abort CI yourself or infer an exception from empty checks, elapsed time, pending checks, or a red or flaky check.
+When the CI gate is parked for a decision, firstmate uses \`$root/bin/fm-ci-witness.sh $id {url} --skip\` to verify live structural evidence and respond through the existing no-mistakes skip action; after the drive call returns a passing outcome, firstmate runs the same helper with \`--record\`.
+When the CI monitor is running, firstmate runs \`--record\` directly: it rechecks the published head, every controllable gate, and the structural evidence, records the witness, then ends the monitor with an explicit \`no-mistakes axi abort\`.
+The pipeline labels that run cancelled; the recorded witness, not that label, is the outcome, and the work is not abandoned.
 For an owned no-CI repository, report \`done [at=<epoch>]: PR {url} CI absent\` only after that witness is recorded; configured merge authority still approves landing.
 For a fork contribution, report \`done [at=<epoch>]: PR {url} published, waiting on upstream\` after the witness is recorded; the external hold records the maintainers' wait and is neither merged nor failed.
 A structural exception never authorizes merge or branch disposal; firstmate keeps merge monitoring and refuses cleanup until the work lands upstream.
@@ -252,6 +288,7 @@ fm_dod_pr_ci_green() {  # <PR-url> <head>
 }
 
 # Prints absent or awaiting-destination-approval on verified structural evidence.
+# Absent also requires a default branch that has never carried a check or status.
 # PR identity, current head, open/non-draft state, complete check inventories and
 # the approval-required workflow all bind to the same destination and head.
 # Red, incomplete, pending or unknown observations refuse, even on a fork.
@@ -267,10 +304,11 @@ fm_dod_ci_not_witnessed() {  # <repository> <canonical-PR-url> <expected-head>
     .state == "open" and .draft == false and .head.sha == $head
     and (.base.repo.full_name | ascii_downcase) == $fetch
     and (.head.repo.full_name | ascii_downcase) == $push' >/dev/null || return 1
-  workflows=$(fm_dod_api_json "repos/$path/actions/workflows?per_page=100") || return 1
   checks=$(fm_dod_api_json "repos/$path/commits/$head/check-runs?per_page=100") || return 1
   statuses=$(fm_dod_api_json "repos/$path/commits/$head/status?per_page=100") || return 1
   if [ "$fetch" = "$push" ]; then
+    workflows=$(fm_dod_api_json "repos/$path/actions/workflows?per_page=100") || return 1
+    [ "$(fm_dod_default_branch_checks "$path")" = never ] || return 1
     printf '%s' "$workflows" | jq -e '.total_count == 0 and .workflows == []' >/dev/null \
       && printf '%s' "$checks" | jq -e '.total_count == 0 and .check_runs == []' >/dev/null \
       && printf '%s' "$statuses" | jq -e '.total_count == 0 and .statuses == []' >/dev/null || return 1

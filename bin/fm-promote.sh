@@ -276,9 +276,6 @@ EOF
   fi
   printf '\n'
   fm_dod_block "$MODE" "$ID" "$BRANCH" "$FORGE" "$BASE_BRANCH"
-  if [ "$MODE" = no-mistakes ] && [ "$FORGE" = none ]; then
-    fm_dod_ci_contract "$PROMOTE_CI_CLASS" "$FM_ROOT" "$ID"
-  fi
 }
 mkdir -p "$DATA/$ID"
 [ ! -d "$INSTRUCTIONS" ] || { echo "error: ship instructions path is a directory: $INSTRUCTIONS" >&2; exit 1; }
@@ -298,6 +295,9 @@ $PROMOTION_SHIP_SPEC
 
 EOF
   promote_delivery_contract
+  # A relaunch from brief.md gets this contract from spawn, so only the live
+  # instructions carry it.
+  [ -z "$PROMOTE_CI_CLASS" ] || fm_dod_ci_contract "$PROMOTE_CI_CLASS" "$FM_ROOT" "$ID"
 } > "$TMP" || { echo "error: could not render ship instructions for mode=$MODE" >&2; exit 1; }
 mv "$TMP" "$INSTRUCTIONS"
 TMP=
