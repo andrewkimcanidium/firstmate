@@ -1946,7 +1946,10 @@ validate_worktree_teardown_safety() {
     return 1
   elif [ "$(sed -n 's/^delivery_state=//p' "$META" | tail -1)" = published ] \
     || [ "$(sed -n 's/^ci_destination=//p' "$META" | tail -1)" = fork-contribution ]; then
-    branch=$(git -C "$WT" symbolic-ref --quiet --short HEAD 2>/dev/null) || return 1
+    if ! branch=$(git -C "$WT" symbolic-ref --quiet --short HEAD 2>/dev/null); then
+      echo "REFUSED: published contribution $ID is not on its branch, so its upstream landing cannot be checked; restore the branch (or get the captain's explicit OK to discard, then --force)." >&2
+      return 1
+    fi
     if ! work_is_landed "$branch"; then
       echo "REFUSED: published contribution $ID is not landed upstream; a fork push or external hold does not authorize disposal." >&2
       return 1

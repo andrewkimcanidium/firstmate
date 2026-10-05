@@ -53,7 +53,8 @@ WT=$(get worktree)
 [ -d "$WT" ] || refuse 'worker copy is missing'
 HEAD=$(git -C "$WT" rev-parse HEAD) || refuse 'cannot read worker head'
 BRANCH=$(git -C "$WT" symbolic-ref --quiet --short HEAD) || refuse 'worker is not on its ship branch'
-CLASS=$(fm_dod_destination_class "$WT")
+FORK=0
+! fm_dod_origin_is_fork "$WT" || FORK=1
 RUN=$(cd "$WT" && no-mistakes axi status) || refuse 'cannot read pipeline evidence'
 [ "$(fm_nm_strip_quotes "$(fm_nm_field "$RUN" branch)")" = "$BRANCH" ] || refuse 'pipeline branch does not match task'
 [ "$(fm_nm_strip_quotes "$(fm_nm_field "$RUN" pr)")" = "$URL" ] || refuse 'pipeline PR does not match task'
@@ -64,13 +65,13 @@ RUN_ID=$(fm_nm_strip_quotes "$(fm_nm_field "$RUN" id)")
 CI=skipped
 if [ "$ACTION" = --skip ]; then CI=awaiting_approval
 elif fm_dod_nm_witness_gates "$RUN" running; then CI=running
-elif [ "$CLASS" = fork-contribution ] && fm_dod_nm_witness_gates "$RUN" completed; then CI=completed
+elif [ "$FORK" = 1 ] && fm_dod_nm_witness_gates "$RUN" completed; then CI=completed
 fi
 fm_dod_nm_witness_gates "$RUN" "$CI" || refuse 'all controllable gates must have completed and CI must be at the required gate/outcome'
 if [ "$CI" = completed ]; then
   fm_dod_pr_ci_green "$URL" "$HEAD" || refuse 'CI is not witnessed green at the open published head'
   WITNESS=green
-elif [ "$CI" = running ] && [ "$CLASS" = fork-contribution ] && fm_dod_pr_ci_green "$URL" "$HEAD"; then
+elif [ "$CI" = running ] && [ "$FORK" = 1 ] && fm_dod_pr_ci_green "$URL" "$HEAD"; then
   WITNESS=green
 else
   WITNESS=$(fm_dod_ci_not_witnessed "$WT" "$URL" "$HEAD") || refuse 'no structural CI exception was witnessed; slow, pending, red and unreadable checks never qualify'
@@ -93,7 +94,7 @@ case "$OUTCOME:$CI" in
   passed:*|passed-with-skips:*|passed-with-override:*|:running) ;;
   *) refuse 'pipeline has no passing outcome or witnessed-green CI-ready monitor' ;;
 esac
-if [ "$CLASS" = fork-contribution ]; then
+if [ "$FORK" = 1 ]; then
   REASON="published, waiting on upstream; gates intent rebase review test document lint push pr passed; CI"
   case "$WITNESS" in
     green) REASON="$REASON witnessed green" ;;
@@ -110,12 +111,12 @@ fi
 TMP=$(mktemp "$STATE/.ci-witness.XXXXXX")
 awk -F= '$1 !~ /^(ci_witness|ci_witness_head|ci_witness_report|ci_witness_run|delivery_state|pr|pr_head)$/' "$META" > "$TMP"
 printf 'ci_witness=%s\nci_witness_head=%s\nci_witness_report=%s\npr=%s\npr_head=%s\n' "$WITNESS" "$HEAD" "$REASON" "$URL" "$HEAD" >> "$TMP"
-[ "$CLASS" != fork-contribution ] || printf 'delivery_state=published\n' >> "$TMP"
+[ "$FORK" != 1 ] || printf 'delivery_state=published\n' >> "$TMP"
 [ -z "$ABORT" ] || printf 'ci_witness_run=%s\n' "$RUN_ID" >> "$TMP"
 chmod 600 "$TMP"
 mv -f -- "$TMP" "$META"
 TMP=
-if [ "$CLASS" = fork-contribution ]; then
+if [ "$FORK" = 1 ]; then
   if fm_backlog_transition_applies "$CONFIG" "$DATA" ship; then
     fm_backlog_published "$DATA" "$ID" "$URL" "$REASON" || refuse "$FM_BACKLOG_TRANSITION_ERROR - rerun --record to finish publication"
   else

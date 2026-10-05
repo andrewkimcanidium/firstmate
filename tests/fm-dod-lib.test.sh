@@ -686,6 +686,10 @@ test_ci_witness_fork_destination_without_ci() {
   assert_grep 'axi abort --run witness-run' "$fork/aborted" 'fork no-CI monitor was left to time out'
   row=$(tasks-axi show witness --file "$fork/data/backlog.md")
   assert_contains "$row" 'hold_kind: external' 'fork without CI did not take the external hold'
+  git -C "$fork/wt" update-ref refs/remotes/fork/fm/witness "$(git -C "$fork/wt" rev-parse HEAD)"
+  accept_done ship no-mistakes "$fork/wt" "$fork/project" \
+    'done: PR https://github.com/owner/repo/pull/1 published, waiting on upstream' \
+    "$fork/state" witness "$fork/state/witness.meta" || fail 'the shared done gate refused a recorded fork absence'
   ci_edit "$fork" history '.data.repository.defaultBranchRef.target.history.nodes[0].statusCheckRollup={state:"SUCCESS"}'
   if ci_assess "$fork" >/dev/null; then fail 'a fork whose default branch carried checks was treated as absent'; fi
   pass 'a fork destination that never carried CI records absence and takes the external hold'

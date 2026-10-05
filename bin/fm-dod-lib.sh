@@ -188,6 +188,15 @@ fm_dod_default_branch_checks() {  # <owner/repo>
 # cleanup until it lands upstream - it stalls loudly rather than losing work.
 # An owned repository is owned-no-ci only with no Actions workflows and a
 # default branch that has never carried a check run or commit status.
+# The one owner of the offline fork rule: origin's normalized GitHub fetch and
+# push identities both parse and differ.
+fm_dod_origin_is_fork() {  # <repository>
+  local fetch push
+  fetch=$(fm_dod_github_repo "$(git -C "$1" remote get-url origin 2>/dev/null)") || return 1
+  push=$(fm_dod_github_repo "$(git -C "$1" remote get-url --push origin 2>/dev/null)") || return 1
+  [ "$fetch" != "$push" ]
+}
+
 fm_dod_destination_class() {  # <explicit-task-project-path>
   local repo=$1 fetch push workflows
   if [ -z "$repo" ] || [ ! -d "$repo" ] || ! git -C "$repo" rev-parse --git-dir >/dev/null 2>&1; then
@@ -200,7 +209,7 @@ fm_dod_destination_class() {  # <explicit-task-project-path>
     echo 'CI destination unclassified: origin fetch/push GitHub identities unavailable; ordinary CI gate retained' >&2
     echo unclassified; return
   fi
-  if [ "$fetch" != "$push" ]; then echo fork-contribution; return; fi
+  if fm_dod_origin_is_fork "$repo"; then echo fork-contribution; return; fi
   if ! workflows=$(fm_dod_api_json "repos/$fetch/actions/workflows?per_page=100"); then
     echo 'CI destination unclassified: workflow inventory unreadable; ordinary CI gate retained' >&2
     echo unclassified; return
@@ -961,7 +970,7 @@ fm_dod_accept_ship_done() {  # <kind> <mode> <worktree> <project> <line> [<state
         echo 'CI witness report does not bind the current named head'; return 1
       fi
       case "$(status_line_note "$line"):$(sed -n 's/^ci_witness=//p' "$meta" | tail -1)" in
-        *"CI absent"*:absent|*"published, waiting on upstream"*:awaiting-destination-approval|*"published, waiting on upstream"*:green) ;;
+        *"CI absent"*:absent|*"published, waiting on upstream"*:absent|*"published, waiting on upstream"*:awaiting-destination-approval|*"published, waiting on upstream"*:green) ;;
         *) echo 'CI witness report does not match the verified structural evidence'; return 1 ;;
       esac
       ;;

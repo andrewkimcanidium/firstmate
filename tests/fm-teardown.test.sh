@@ -4520,6 +4520,13 @@ test_published_fork_remote_refuses_until_upstream_lands() {
   assert_present "$case_dir/state/task-x1.meta" 'refusal removed metadata'
   assert_present "$case_dir/wt" 'refusal removed published worktree'
   [ "$(backlog_row_state "$case_dir")" != "done" ] || fail 'refusal closed published work as landed'
+  git -C "$case_dir/wt" checkout -q --detach
+  rc=0
+  run_teardown "$case_dir" > "$case_dir/stdout" 2> "$case_dir/stderr" || rc=$?
+  expect_code 1 "$rc" 'detached published contribution was discarded'
+  assert_grep 'is not on its branch' "$case_dir/stderr" 'detached published refusal gave no reason'
+  assert_present "$case_dir/wt" 'detached refusal removed published worktree'
+  git -C "$case_dir/wt" checkout -q -
   add_gh_pr_merged_for_head "$case_dir" "$(git -C "$case_dir/wt" rev-parse HEAD)"
   run_teardown "$case_dir" > "$case_dir/stdout" 2> "$case_dir/stderr" \
     || fail 'upstream merge did not release published contribution cleanup'

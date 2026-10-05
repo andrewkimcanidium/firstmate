@@ -1866,20 +1866,22 @@ checks failed: 1 of 2 checks red" ;;
 # no verdict.
 test_cancelled_run_ended_by_ci_witness() {
   local scenario failures=0
-  for scenario in outcome status other-run stale-head no-report; do
+  for scenario in outcome status fork-absent other-run stale-head no-report; do
     (
       reset_fakes
-      local d out head run=01RUN
+      local d out head witness run=01RUN
       d=$(new_case "witness-cancel-$scenario")
       make_repo_on_branch "$d/wt" fm/witness
       make_fakebin "$d" >/dev/null
       head=$FM_FAKE_RUN_HEAD
+      witness=awaiting-destination-approval
       case "$scenario" in
+        fork-absent) witness=absent ;;
         other-run) run=02OTHER ;;
         stale-head) head=0000000000000000000000000000000000000000 ;;
       esac
       fm_write_meta "$d/state/witness.meta" "window=fm:fm-witness" "worktree=$d/wt" "kind=ship" \
-        "mode=no-mistakes" "pr=https://github.com/o/r/pull/203" "ci_witness=awaiting-destination-approval" \
+        "mode=no-mistakes" "pr=https://github.com/o/r/pull/203" "ci_witness=$witness" \
         "ci_witness_head=$head" "ci_witness_run=$run" "delivery_state=published"
       [ "$scenario" = no-report ] \
         || printf 'done: PR https://github.com/o/r/pull/203 published, waiting on upstream\n' > "$d/state/witness.status"
@@ -1889,7 +1891,7 @@ test_cancelled_run_ended_by_ci_witness() {
       FM_FAKE_CI_LOGS="no CI checks reported yet"
       out=$(FM_HOME="$d" run_crew_state "$d" witness)
       case "$scenario" in
-        outcome|status)
+        outcome|status|fork-absent)
           assert_contains "$out" "state: done" "$scenario: recorded witness was masked by the cancel: $out"
           assert_contains "$out" "published, waiting on upstream" "$scenario: witness report missing" ;;
         stale-head)
