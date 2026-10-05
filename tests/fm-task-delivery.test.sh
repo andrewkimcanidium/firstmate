@@ -1647,6 +1647,34 @@ test_spawn_requires_the_brief_to_carry_the_selected_branch
 test_spawn_notices_a_ship_branch_against_the_registry_prefix
 test_spawn_refuses_a_registry_forge_it_cannot_read
 test_promotion_carries_the_forge_binding
+test_spawn_and_promotion_classify_the_explicit_task_project() {
+  local rec home proj fakebin out id
+  rec=$(make_home ci-task-binding '- proj [no-mistakes] - fixture')
+  IFS='|' read -r home proj fakebin <<EOF
+$rec
+EOF
+  git -C "$proj" remote add origin https://github.com/upstream/repo.git
+  git -C "$proj" remote set-url --push origin git@github.com:contributor/repo.git
+  id=ci-bound-ship
+  FM_HOME="$home" "$BRIEF" "$id" unrelated-scaffold-name --mode no-mistakes >/dev/null
+  fill_brief_subsections "$home/data/$id/brief.md" 'Ship this contribution.' 'Use the resolved task project.'
+  out=$(run_spawn "$home" "$fakebin" "$id" "$proj" claude --mode no-mistakes --yolo off)
+  assert_grep 'CI destination class: fork-contribution' "$home/data/$id/launch-brief.md" \
+    'spawn classified the scaffold name instead of its actual project'
+  id=ci-bound-promoted
+  printf 'window=fm-%s\nkind=scout\nworktree=/tmp/wt\nproject=%s\n' "$id" "$proj" > "$home/state/$id.meta"
+  FM_HOME="$home" "$BRIEF" "$id" unrelated-scaffold-name --scout >/dev/null
+  fill_brief_subsections "$home/data/$id/brief.md" 'Ship this contribution.' 'Use the resolved task project.'
+  out=$(FM_HOME="$home" "$PROMOTE" "$id" --mode no-mistakes --yolo off 2>&1) \
+    || fail "bound-project promotion failed: $out"
+  assert_grep 'CI destination class: fork-contribution' "$home/data/$id/ship-instructions.md" \
+    'promotion did not classify the project in task metadata'
+  assert_grep 'ci_destination=fork-contribution' "$home/state/$id.meta" 'promotion omitted destination metadata'
+  pass 'spawn and promotion classify the explicit task project through the same entry point'
+}
+
+
+test_spawn_and_promotion_classify_the_explicit_task_project
 test_spawn_and_promote_require_filled_task_subsections
 test_project_mode_resolves_branch_prefix
 echo "# all fm-task-delivery tests passed"

@@ -669,6 +669,13 @@ case "$MODE" in
 esac
 RULE1=$(fm_ship_rule_one "$MODE" "$ID" "$BRANCH" "$FORGE" "$BASE_BRANCH") || exit 1
 DOD=$(fm_dod_block "$MODE" "$ID" "$BRANCH" "$FORGE" "$BASE_BRANCH") || exit 1
+if [ "$MODE" = no-mistakes ] && [ "$FORGE" = none ]; then
+  # Scaffolding is not dispatch: its repo-name argument is not necessarily the
+  # task's resolved project, and generating prose must not require the network.
+  CI_CONTRACT=$(fm_dod_ci_contract unclassified "$FM_ROOT" "$ID") || exit 1
+  DOD="$DOD
+$CI_CONTRACT"
+fi
 
 cat > "$BRIEF" <<EOF
 You are a crewmate: an autonomous worker agent managed by firstmate. Work on your own; do not wait for a human.

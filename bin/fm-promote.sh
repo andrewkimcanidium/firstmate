@@ -203,6 +203,10 @@ fm_base_branch_valid "$BASE_BRANCH" "$MODE" "$FORGE" "fm-promote.sh $ID" || exit
 PROMOTE_BASE_WORDS='default-branch base'
 [ -z "$BASE_BRANCH" ] || PROMOTE_BASE_WORDS="copy of the base branch \`$BASE_BRANCH\`"
 # An unbound project keeps the exact wording it always had.
+PROMOTE_CI_CLASS=
+if [ "$MODE" = no-mistakes ] && [ "$FORGE" = none ]; then
+  PROMOTE_CI_CLASS=$(fm_dod_destination_class "$PROMOTE_PROJECT")
+fi
 PROMOTE_FORGE_WORDS=
 [ "$FORGE" = none ] || PROMOTE_FORGE_WORDS=" forge=$FORGE"
 
@@ -272,6 +276,9 @@ EOF
   fi
   printf '\n'
   fm_dod_block "$MODE" "$ID" "$BRANCH" "$FORGE" "$BASE_BRANCH"
+  if [ "$MODE" = no-mistakes ] && [ "$FORGE" = none ]; then
+    fm_dod_ci_contract "$PROMOTE_CI_CLASS" "$FM_ROOT" "$ID"
+  fi
 }
 mkdir -p "$DATA/$ID"
 [ ! -d "$INSTRUCTIONS" ] || { echo "error: ship instructions path is a directory: $INSTRUCTIONS" >&2; exit 1; }
@@ -330,6 +337,7 @@ grep -v -e '^kind=' -e '^mode=' -e '^yolo=' -e '^branch=' "$META" > "$TMP"
   echo "mode=$MODE"
   echo "yolo=$YOLO"
   echo "branch=$BRANCH"
+  [ -z "$PROMOTE_CI_CLASS" ] || echo "ci_destination=$PROMOTE_CI_CLASS"
 } >> "$TMP"
 if ! fm_backlog_atomic_transition publish "$TMP" "$META" "task record" "$STATE"; then
   rm -f -- "$TMP"
