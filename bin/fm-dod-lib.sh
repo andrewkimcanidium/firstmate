@@ -155,10 +155,13 @@ fm_dod_api_json() {  # <GitHub REST path | graphql --field query=...>
 # that has ever carried a check run or commit status has CI configured, however
 # slowly it reports now. Prints never only after reading the complete history,
 # carried on the first rollup found; unreadable or malformed history fails.
+# The opaque page cursor travels as a GraphQL variable, never inside the query;
+# gh reads an @-prefixed field value as a file, so such a cursor fails.
 fm_dod_default_branch_checks() {  # <owner/repo>
-  local owner=${1%%/*} name=${1#*/} after=null page state
+  local owner=${1%%/*} name=${1#*/} page state
+  local after=()
   while :; do
-    page=$(fm_dod_api_json graphql --field "query=query{repository(owner:\"$owner\",name:\"$name\"){defaultBranchRef{target{...on Commit{history(first:100,after:$after){pageInfo{hasNextPage endCursor}nodes{statusCheckRollup{state}}}}}}}}") || return 1
+    page=$(fm_dod_api_json graphql --field "query=query(\$after:String){repository(owner:\"$owner\",name:\"$name\"){defaultBranchRef{target{...on Commit{history(first:100,after:\$after){pageInfo{hasNextPage endCursor}nodes{statusCheckRollup{state}}}}}}}}" ${after[@]+"${after[@]}"}) || return 1
     state=$(printf '%s' "$page" | jq -r '.data.repository.defaultBranchRef.target.history
       | if (.nodes | type) != "array" or (.pageInfo.hasNextPage | type) != "boolean" then "bad"
         elif any(.nodes[]; .statusCheckRollup != null) then "carried"
@@ -166,11 +169,10 @@ fm_dod_default_branch_checks() {  # <owner/repo>
         else "never" end') || return 1
     case "$state" in
       carried|never) echo "$state"; return 0 ;;
-      next:*) after=${state#next:} ;;
+      next:|next:@*) return 1 ;;
+      next:*) after=(--field "after=${state#next:}") ;;
       *) return 1 ;;
     esac
-    case "$after" in ''|*[!A-Za-z0-9+/=_:-]*) return 1 ;; esac
-    after="\"$after\""
   done
 }
 

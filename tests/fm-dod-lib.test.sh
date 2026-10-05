@@ -460,7 +460,11 @@ PYFIX
 import base64, os, pathlib, sys
 p = pathlib.Path(os.environ['WITNESS_FIXTURE'])
 path = sys.argv[2]
-if path == 'graphql': name='history'
+after = [a[6:] for a in sys.argv if a.startswith('after=')]
+if path == 'graphql' and after:
+    with open(p/'cursors','a') as f: f.write(after[0]+'\n')
+    name='history-next'
+elif path == 'graphql': name='history'
 elif '/pulls/' in path: name='pr'
 elif '/workflows?' in path: name='workflows'
 elif '/check-runs?' in path: name='checks'
@@ -547,9 +551,23 @@ test_ci_destination_classes_and_refusals() {
   ci_edit "$no_ci" history '.data.repository.defaultBranchRef.target.history.nodes[0].statusCheckRollup={state:"SUCCESS"}'
   [ "$(ci_class "$no_ci")" = owned-ci ] || fail 'historical default-branch checks did not mark CI configured'
   if ci_assess "$no_ci" >/dev/null; then fail 'a not-yet-reported check with history was treated as absent'; fi
-  ci_edit "$no_ci" history '.data.repository.defaultBranchRef.target.history.nodes[0].statusCheckRollup=null | .data.repository.defaultBranchRef.target.history.pageInfo={hasNextPage:true,endCursor:"bad cursor"}'
+  ci_edit "$no_ci" history '.data.repository.defaultBranchRef.target.history.nodes[0].statusCheckRollup=null'
+  cp "$no_ci/history.json" "$no_ci/history-next.json"
+  ci_edit "$no_ci" history '.data.repository.defaultBranchRef.target.history.pageInfo={hasNextPage:true,endCursor:"9c1f0e2 99"}'
+  [ "$(ci_class "$no_ci")" = owned-no-ci ] || fail 'a realistic multi-page check-free history was not classified'
+  [ "$(ci_assess "$no_ci")" = absent ] || fail 'a realistic multi-page check-free history did not prove absence'
+  [ "$(sort -u "$no_ci/cursors")" = '9c1f0e2 99' ] || fail 'history cursor was not passed through verbatim'
+  ci_edit "$no_ci" history-next '.data.repository.defaultBranchRef.target.history.nodes[0].statusCheckRollup={state:"SUCCESS"}'
+  [ "$(ci_class "$no_ci")" = owned-ci ] || fail 'a check on a later history page did not mark CI configured'
+  if ci_assess "$no_ci" >/dev/null; then fail 'a check on a later history page was treated as absent'; fi
+  ci_edit "$no_ci" history-next '.data.repository.defaultBranchRef.target.history.nodes[0].statusCheckRollup=null'
+  ci_edit "$no_ci" history '.data.repository.defaultBranchRef.target.history.pageInfo.endCursor="\"quoted\" 99"'
+  [ "$(ci_assess "$no_ci")" = absent ] || fail 'an opaque cursor with quotes was not carried safely'
+  ci_edit "$no_ci" history '.data.repository.defaultBranchRef.target.history.pageInfo.endCursor=null'
   [ "$(ci_class "$no_ci")" = unclassified ] || fail 'incomplete check history was classified'
   if ci_assess "$no_ci" >/dev/null; then fail 'incomplete check history proved absence'; fi
+  ci_edit "$no_ci" history '.data.repository.defaultBranchRef.target.history.pageInfo.endCursor="@/etc/passwd"'
+  if ci_assess "$no_ci" >/dev/null; then fail 'a file-reading cursor was sent'; fi
   ci_edit "$no_ci" history '.data.repository.defaultBranchRef.target.history.pageInfo={hasNextPage:false,endCursor:null}'
   ci_edit "$no_ci" rules '[{type:"required_status_checks",parameters:{required_status_checks:[{context:"required CI"}]}}]'
   if ci_assess "$no_ci" >/dev/null; then fail 'unreported required CI was treated as absent'; fi
@@ -612,6 +630,7 @@ test_ci_witness_ends_a_running_monitor_only_for_structural_causes() {
   assert_grep 'axi abort --run witness-run' "$no_ci/aborted" 'no-CI monitor was not ended'
   assert_contains "$out" 'CI not witnessed - absent' 'absence was not stated'
   assert_grep 'ci_witness=absent' "$no_ci/state/witness.meta" 'absence witness not recorded'
+  assert_grep 'ci_witness_run=witness-run' "$no_ci/state/witness.meta" 'aborted run was not bound to the witness'
   owned=$(make_ci_case running-owned owned 0)
   write_ci_run "$owned" running ''
   ci_edit "$owned" history '.data.repository.defaultBranchRef.target.history.nodes[0].statusCheckRollup={state:"PENDING"}'

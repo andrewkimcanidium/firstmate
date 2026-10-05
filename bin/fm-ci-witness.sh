@@ -106,9 +106,10 @@ fi
 # Stage a recoverable witness before the backlog transition. Repeating --record
 # rechecks all evidence and reapplies the same external hold if it was interrupted.
 TMP=$(mktemp "$STATE/.ci-witness.XXXXXX")
-awk -F= '$1 !~ /^(ci_witness|ci_witness_head|ci_witness_report|delivery_state|pr|pr_head)$/' "$META" > "$TMP"
+awk -F= '$1 !~ /^(ci_witness|ci_witness_head|ci_witness_report|ci_witness_run|delivery_state|pr|pr_head)$/' "$META" > "$TMP"
 printf 'ci_witness=%s\nci_witness_head=%s\nci_witness_report=%s\npr=%s\npr_head=%s\n' "$WITNESS" "$HEAD" "$REASON" "$URL" "$HEAD" >> "$TMP"
 [ "$CLASS" != fork-contribution ] || printf 'delivery_state=published\n' >> "$TMP"
+[ -z "$ABORT" ] || printf 'ci_witness_run=%s\n' "$RUN_ID" >> "$TMP"
 chmod 600 "$TMP"
 mv -f -- "$TMP" "$META"
 TMP=
