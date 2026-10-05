@@ -592,6 +592,13 @@ test_ci_witness_skip_record_and_publication() {
   out=$(ci_command "$no_ci" --record) || fail "no-CI witness record failed: $out"
   assert_contains "$out" 'CI not witnessed - absent' 'absence was not stated'
   assert_no_grep 'delivery_state=published' "$no_ci/state/witness.meta" 'owned no-CI PR was called a contribution'
+  git -C "$no_ci/wt" update-ref refs/remotes/origin/fm/witness "$(git -C "$no_ci/wt" rev-parse HEAD)"
+  accept_done ship no-mistakes "$no_ci/wt" "$no_ci/project" \
+    'done: PR https://github.com/owner/repo/pull/1 CI absent' \
+    "$no_ci/state" witness "$no_ci/state/witness.meta" || fail 'the shared done gate refused a recorded owned absence'
+  if accept_done ship no-mistakes "$no_ci/wt" "$no_ci/project" \
+    'done: PR https://github.com/owner/repo/pull/1 published, waiting on upstream' \
+    "$no_ci/state" witness "$no_ci/state/witness.meta" >/dev/null; then fail 'an owned no-CI PR was reported as waiting on upstream'; fi
   fork=$(make_ci_case fork-record fork 1)
   out=$(ci_command "$fork" --record) || fail "fork publication failed: $out"
   assert_contains "$out" 'destination withholds fork workflows pending maintainer approval' 'structural reason missing'
@@ -690,6 +697,9 @@ test_ci_witness_fork_destination_without_ci() {
   accept_done ship no-mistakes "$fork/wt" "$fork/project" \
     'done: PR https://github.com/owner/repo/pull/1 published, waiting on upstream' \
     "$fork/state" witness "$fork/state/witness.meta" || fail 'the shared done gate refused a recorded fork absence'
+  if accept_done ship no-mistakes "$fork/wt" "$fork/project" \
+    'done: PR https://github.com/owner/repo/pull/1 CI absent' \
+    "$fork/state" witness "$fork/state/witness.meta" >/dev/null; then fail 'a published fork contribution was reported as an owned no-CI landing'; fi
   ci_edit "$fork" history '.data.repository.defaultBranchRef.target.history.nodes[0].statusCheckRollup={state:"SUCCESS"}'
   if ci_assess "$fork" >/dev/null; then fail 'a fork whose default branch carried checks was treated as absent'; fi
   pass 'a fork destination that never carried CI records absence and takes the external hold'

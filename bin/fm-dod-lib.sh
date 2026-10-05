@@ -969,8 +969,8 @@ fm_dod_accept_ship_done() {  # <kind> <mode> <worktree> <project> <line> [<state
       if [ "$(sed -n 's/^ci_witness_head=//p' "$meta" | tail -1)" != "$sha" ]; then
         echo 'CI witness report does not bind the current named head'; return 1
       fi
-      case "$(status_line_note "$line"):$(sed -n 's/^ci_witness=//p' "$meta" | tail -1)" in
-        *"CI absent"*:absent|*"published, waiting on upstream"*:absent|*"published, waiting on upstream"*:awaiting-destination-approval|*"published, waiting on upstream"*:green) ;;
+      case "$(status_line_note "$line"):$(sed -n 's/^ci_witness=//p' "$meta" | tail -1):$(sed -n 's/^delivery_state=//p' "$meta" | tail -1)" in
+        *"CI absent"*:absent:|*"published, waiting on upstream"*:absent:published|*"published, waiting on upstream"*:awaiting-destination-approval:published|*"published, waiting on upstream"*:green:published) ;;
         *) echo 'CI witness report does not match the verified structural evidence'; return 1 ;;
       esac
       ;;
