@@ -1,0 +1,98 @@
+### code under test: 06d367c12b4dac205b4d42d3a7269260df891af6; gh-axi 0.1.35
+
+### S1 dispatch classification of explicit task projects (real GitHub API)
+fork         -> fork-contribution 
+owned-ci     -> owned-ci 
+hello-world  -> owned-no-ci 
+sap-cpq-axi  -> owned-ci 
+wow-parser   -> owned-ci 
+gitlab       -> CI destination unclassified: origin fetch/push GitHub identities unavailable; ordinary CI gate retained unclassified 
+(none)       -> CI destination unclassified: no explicit Git task project; ordinary CI gate retained unclassified 
+
+### S2 default-branch check history (POST graphql, real cursors)
+andrewkimcanidium/hello-world        never rc=0
+kunchenguid/wow-combat-log-parser    never rc=0
+kunchenguid/firstmate                carried rc=0
+
+### S3 structural witness, kunchenguid/firstmate#6432 head=9efb7666739e7a80acdfec552f9e89ec02f30202
+upstream workflow runs: CI:completed/action_required, Require no-mistakes:completed/action_required
+upstream check-runs:    Greptile Review:completed/success
+adversarial: green 3rd-party check beside action_required runs -> pr_ci_green rc=1 (non-zero = not green)
+fork witness at published head: awaiting-destination-approval rc=0
+adversarial: stale head -> rc=1
+adversarial: same PR assessed as owned (fetch=push) -> rc=1 (must not be absent)
+adversarial: owned repo with configured CI (no-mistakes PR 1333, open) -> ci_not_witnessed rc=1 (must refuse)
+
+### S4 fm-ci-witness.sh --record on a running CI monitor (lab home; real GitHub; no-mistakes axi stubbed at the CLI boundary)
+lab worker head: 9efb7666739e7a80acdfec552f9e89ec02f30202
+-- adversarial A1: review gate skipped
+REFUSED: all controllable gates must have completed and CI must be at the required gate/outcome
+exit=1
+-- adversarial A2: CI step red/failed
+REFUSED: all controllable gates must have completed and CI must be at the required gate/outcome
+exit=1
+-- adversarial A3: --skip on running monitor
+REFUSED: all controllable gates must have completed and CI must be at the required gate/outcome
+exit=1
+-- adversarial A4: unrelated PR named
+REFUSED: pipeline PR does not match task
+exit=1
+-- adversarial A5: worker head moved past published head
+REFUSED: no structural CI exception was witnessed; slow, pending, red and unreadable checks never qualify
+exit=1
+aborted so far: none
+-- MAIN: gates green, CI monitor running, upstream workflows action_required
+witness: published, waiting on upstream; gates intent rebase review test document lint push pr passed; CI not witnessed - destination withholds fork workflows pending maintainer approval; PR https://github.com/kunchenguid/firstmate/pull/6432; wait owned by destination maintainers; no-mistakes run 01LIVEFORKRUN CI monitor ended by explicit abort, so the pipeline records that run as cancelled, not abandoned
+exit=0
+-- metadata:
+kind=ship
+mode=no-mistakes
+worktree=/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-witness-r4.YpTSy6/home/wt
+project=/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-witness-r4.YpTSy6/home/wt
+ci_witness=awaiting-destination-approval
+ci_witness_head=9efb7666739e7a80acdfec552f9e89ec02f30202
+ci_witness_report=published, waiting on upstream; gates intent rebase review test document lint push pr passed; CI not witnessed - destination withholds fork workflows pending maintainer approval; PR https://github.com/kunchenguid/firstmate/pull/6432; wait owned by destination maintainers; no-mistakes run 01LIVEFORKRUN CI monitor ended by explicit abort, so the pipeline records that run as cancelled, not abandoned
+pr=https://github.com/kunchenguid/firstmate/pull/6432
+pr_head=9efb7666739e7a80acdfec552f9e89ec02f30202
+delivery_state=published
+ci_witness_run=01LIVEFORKRUN
+-- backlog row:
+task:
+  id: usage
+  title: "usage capture hooks https://github.com/kunchenguid/firstmate/pull/6432"
+  state: in_flight
+  blocked: no
+  blocked_by: none
+  held: yes
+  hold_reason: "published, waiting on upstream; gates intent rebase review test document lint push pr passed; CI not witnessed - destination withholds fork workflows pending maintainer approval; PR https://github.com/kunchenguid/firstmate/pull/6432; wait owned by destination maintainers; no-mistakes run 01LIVEFORKRUN CI monitor ended by explicit abort, so the pipeline records that run as cancelled, not abandoned"
+  hold_kind: external
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-05
+  closed: "-"
+  deps: none
+  links: "pr:https://github.com/kunchenguid/firstmate/pull/6432"
+  body: ""
+-- pipeline calls: aborted=[axi abort --run 01LIVEFORKRUN] responded=[none]
+
+### S5 resolved state after the witness abort (fm-crew-state.sh)
+status log: done: PR https://github.com/kunchenguid/firstmate/pull/6432 published, waiting on upstream
+-- exact recorded witness run:
+state: done · source: status-log · PR https://github.com/kunchenguid/firstmate/pull/6432 published, waiting on upstream · CI witness recorded; run cancelled by the witness abort
+-- adversarial: a different cancelled run id:
+state: unknown · source: run-step · run cancelled: no verdict
+-- adversarial: no worker done report:
+state: unknown · source: run-step · run cancelled: no verdict
+-- adversarial: worker copy moved past the witnessed head:
+state: blocked · source: status-log · CI witness report does not bind the current named head
+
+### S6 teardown of the published contribution (fm-teardown.sh, lab home)
+head reachable from remote-tracking origin/fm/usage (fork push): origin/fm/usage
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: published contribution usage is not landed upstream; a fork push or external hold does not authorize disposal.
+exit=1
+worktree still present: yes; meta still present: yes

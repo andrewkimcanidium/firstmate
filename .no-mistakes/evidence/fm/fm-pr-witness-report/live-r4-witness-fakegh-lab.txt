@@ -1,0 +1,64 @@
+### code under test: 06d367c12b4dac205b4d42d3a7269260df891af6
+
+### R4-1 ci-1: fork PR, only a third-party app check (Greptile Review: success), zero destination workflow runs
+-- running CI monitor --record:
+REFUSED: no structural CI exception was witnessed; slow, pending, red and unreadable checks never qualify
+exit=1
+-- passed run, CI completed --record:
+REFUSED: CI is not witnessed green at the open published head
+exit=1
+ci_witness in meta: []  aborted: []
+-- control: destination's own workflow run completed success:
+witness: published, waiting on upstream; gates intent rebase review test document lint push pr passed; CI witnessed green; PR https://github.com/owner/repo/pull/1; wait owned by destination maintainers
+exit=0
+ci_witness in meta: [green]
+
+### R4-2 ci-2: fork destination with no CI at all -> absent + published + external hold + abort
+witness: published, waiting on upstream; gates intent rebase review test document lint push pr passed; CI not witnessed - absent: destination has no configured workflows or checks, and none ever on its default branch; PR https://github.com/owner/repo/pull/1; wait owned by destination maintainers; no-mistakes run 01LABRUN CI monitor ended by explicit abort, so the pipeline records that run as cancelled, not abandoned
+exit=0
+ci_witness=absent
+delivery_state=published
+ci_witness_run=01LABRUN
+backlog:  held: yes  hold_kind: external 
+aborted: [axi abort --run 01LABRUN]
+gh-axi calls made by --record (witness-redundant-classification fix: workflows/history read once):
+   1 POST graphql
+   1 repos/owner/repo/actions/runs?head_sha=7aafa774e6ddc8effe9ffc982f394cbdf8eb01bd&per_page=100 --full
+   1 repos/owner/repo/actions/workflows?per_page=100 --full
+   1 repos/owner/repo/branches/main --full
+   2 repos/owner/repo/commits/7aafa774e6ddc8effe9ffc982f394cbdf8eb01bd/check-runs?per_page=100 --full
+   2 repos/owner/repo/commits/7aafa774e6ddc8effe9ffc982f394cbdf8eb01bd/status?per_page=100 --full
+   2 repos/owner/repo/pulls/1 --full
+   1 repos/owner/repo/rules/branches/main --full
+-- adversarial: fork whose default branch once carried a check run:
+REFUSED: no structural CI exception was witnessed; slow, pending, red and unreadable checks never qualify
+exit=1
+ci_witness in meta: [] aborted: []
+
+### R4-3 fork-absent done line resolves through the shared done gate (fm-crew-state.sh, cancelled witness run)
+-- worker reports 'published, waiting on upstream':
+state: done · source: status-log · PR https://github.com/owner/repo/pull/1 published, waiting on upstream · CI witness recorded; run cancelled by the witness abort
+-- adversarial: fork reports owned wording 'CI absent':
+state: blocked · source: status-log · CI witness report does not match the verified structural evidence
+
+### R4-4 owned repo without CI: phrase binding to delivery_state
+witness: gates intent rebase review test document lint push pr passed; CI not witnessed - absent: no configured workflows or checks, and none ever on the default branch; PR https://github.com/owner/repo/pull/1; awaiting configured merge authority; no-mistakes run 01LABRUN CI monitor ended by explicit abort, so the pipeline records that run as cancelled, not abandoned
+exit=0
+ci_witness=absent
+ci_witness_run=01LABRUN
+(no delivery_state line expected above)
+backlog:  held: no
+-- worker reports 'CI absent':
+state: done · source: status-log · PR https://github.com/owner/repo/pull/1 CI absent · CI witness recorded; run cancelled by the witness abort
+-- adversarial: owned repo reports 'published, waiting on upstream':
+state: blocked · source: status-log · CI witness report does not match the verified structural evidence
+
+### R4-5 teardown of a detached published fork worktree explains its refusal
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-witness-r4b.4nxRMM/forkabsent
+REFUSED: published contribution witness is not on its branch, so its upstream landing cannot be checked; restore the branch (or get the captain's explicit OK to discard, then --force).
+exit=1
+-- control: same worktree back on its branch (fork push only, not landed upstream):
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+REFUSED: published contribution witness is not landed upstream; a fork push or external hold does not authorize disposal.
+exit=1
+worktree still present: yes; meta still present: yes
