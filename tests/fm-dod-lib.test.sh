@@ -459,7 +459,10 @@ PYFIX
 #!/usr/bin/env python3
 import base64, os, pathlib, sys
 p = pathlib.Path(os.environ['WITNESS_FIXTURE'])
-path = sys.argv[2]
+args = sys.argv[2:]
+method = args.pop(0) if args[0] == 'POST' else 'GET'
+path = args[0]
+if path == 'graphql' and method != 'POST': sys.exit(1)
 after = [a[6:] for a in sys.argv if a.startswith('after=')]
 if path == 'graphql' and after:
     with open(p/'cursors','a') as f: f.write(after[0]+'\n')
@@ -600,6 +603,12 @@ test_ci_witness_skip_record_and_publication() {
   ci_command "$fork" --record >/dev/null || fail 'repeated publication was not idempotent'
   ci_edit "$fork" checks '.total_count=1 | .check_runs=[{status:"completed",conclusion:"success"}]'
   write_ci_run "$fork" running ''
+  out=$(ci_command "$fork" --record) || fail "green third-party check beside approval-required runs was refused: $out"
+  assert_contains "$out" 'destination withholds fork workflows pending maintainer approval' 'a third-party check was recorded as green CI'
+  assert_grep 'ci_witness=awaiting-destination-approval' "$fork/state/witness.meta" 'approval-required CI was recorded as green'
+  assert_grep 'axi abort --run witness-run' "$fork/aborted" 'approval-required monitor was left to time out'
+  rm -f "$fork/aborted"
+  ci_edit "$fork" runs '.workflow_runs[0].conclusion="success"'
   out=$(ci_command "$fork" --record) || fail "green fork CI-ready monitor was not published: $out"
   assert_contains "$out" 'CI witnessed green' 'green fork CI was mislabeled unwitnessed'
   head=$(git -C "$fork/wt" rev-parse HEAD)

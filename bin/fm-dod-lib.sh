@@ -137,7 +137,7 @@ fm_dod_github_repo() {  # <remote-url>
 
 # gh-axi renders API results as TOON. Ask it for a base64-encoded JSON scalar,
 # then decode only its non-truncated body, avoiding rendered array/table parsing.
-fm_dod_api_json() {  # <GitHub REST path | graphql --field query=...>
+fm_dod_api_json() {  # <GitHub REST path | POST graphql --field query=...>
   local out body
   out=$(fm_run_timed 15 gh-axi api "$@" --full --jq 'tojson | @base64') || return 1
   [ "$(printf '%s\n' "$out" | sed -n 's/^  truncated: //p')" = false ] || return 1
@@ -157,11 +157,12 @@ fm_dod_api_json() {  # <GitHub REST path | graphql --field query=...>
 # carried on the first rollup found; unreadable or malformed history fails.
 # The opaque page cursor travels as a GraphQL variable, never inside the query;
 # gh reads an @-prefixed field value as a file, so such a cursor fails.
+# gh-axi defaults to GET, which answers graphql with the schema, so POST is explicit.
 fm_dod_default_branch_checks() {  # <owner/repo>
   local owner=${1%%/*} name=${1#*/} page state
   local after=()
   while :; do
-    page=$(fm_dod_api_json graphql --field "query=query(\$after:String){repository(owner:\"$owner\",name:\"$name\"){defaultBranchRef{target{...on Commit{history(first:100,after:\$after){pageInfo{hasNextPage endCursor}nodes{statusCheckRollup{state}}}}}}}}" ${after[@]+"${after[@]}"}) || return 1
+    page=$(fm_dod_api_json POST graphql --field "query=query(\$after:String){repository(owner:\"$owner\",name:\"$name\"){defaultBranchRef{target{...on Commit{history(first:100,after:\$after){pageInfo{hasNextPage endCursor}nodes{statusCheckRollup{state}}}}}}}}" ${after[@]+"${after[@]}"}) || return 1
     state=$(printf '%s' "$page" | jq -r '.data.repository.defaultBranchRef.target.history
       | if (.nodes | type) != "array" or (.pageInfo.hasNextPage | type) != "boolean" then "bad"
         elif any(.nodes[]; .statusCheckRollup != null) then "carried"
@@ -271,8 +272,10 @@ fm_dod_nm_witness_gates() {  # <axi-status> <ci-status>
 
 # The ordinary witnessed-green fork ready point need not wait for the pipeline's
 # merge monitor to end. It still needs positive CI at this exact open PR head.
+# A green third-party check is not CI while the destination's own workflow runs
+# at that head still await approval or are pending.
 fm_dod_pr_ci_green() {  # <PR-url> <head>
-  local url=$1 head=$2 path number pr checks statuses
+  local url=$1 head=$2 path number pr checks statuses runs
   fm_pr_url_parse "$url" && [ "$FM_PR_PROVIDER" = github ] && [ "$FM_PR_HOST" = github.com ] || return 1
   path=$FM_PR_PATH number=$FM_PR_NUMBER
   pr=$(fm_dod_api_json "repos/$path/pulls/$number") || return 1
@@ -285,6 +288,10 @@ fm_dod_pr_ci_green() {  # <PR-url> <head>
       .status == "completed" and (.conclusion == "success" or .conclusion == "neutral" or .conclusion == "skipped"))' >/dev/null || return 1
   printf '%s' "$statuses" | jq -e '
     (.total_count == (.statuses | length)) and all(.statuses[]; .state == "success")' >/dev/null || return 1
+  runs=$(fm_dod_api_json "repos/$path/actions/runs?head_sha=$head&per_page=100") || return 1
+  printf '%s' "$runs" | jq -e '
+    (.total_count == (.workflow_runs | length)) and all(.workflow_runs[];
+      .status == "completed" and (.conclusion == "success" or .conclusion == "neutral" or .conclusion == "skipped"))' >/dev/null || return 1
   [ "$(printf '%s' "$checks" | jq '.total_count')" -gt 0 ] \
     || [ "$(printf '%s' "$statuses" | jq '.total_count')" -gt 0 ]
 }
