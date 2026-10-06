@@ -1,0 +1,61 @@
+ok - fm-control relaunch: an armed PR merge poll stays authenticated (trace off)
+ok - fm-control relaunch: an armed PR merge poll stays authenticated (trace on)
+ok - fm-control relaunch: durable task metadata survives replacement launch publication
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/pre-rebase: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/pre-applypatch: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/pre-auto-gc: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/pre-merge-commit: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/post-commit: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/sendemail-validate: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/applypatch-msg: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/prepare-commit-msg: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/post-checkout: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/post-applypatch: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/post-rewrite: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/commit-msg: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/pre-push: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/post-merge: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks/pre-commit: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state/rl19.git-hooks: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home/state: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717/home: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/durable-meta-6717: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/pre-rebase: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/pre-applypatch: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/pre-auto-gc: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/pre-merge-commit: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/post-commit: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/sendemail-validate: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/applypatch-msg: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/prepare-commit-msg: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/post-checkout: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/post-applypatch: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/post-rewrite: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/commit-msg: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/pre-push: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/post-merge: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks/pre-commit: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state/rl23.git-hooks: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home/state: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385/home: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-off-5385: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/pre-rebase: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/pre-applypatch: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/pre-auto-gc: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/pre-merge-commit: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/post-commit: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/sendemail-validate: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/applypatch-msg: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/prepare-commit-msg: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/post-checkout: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/post-applypatch: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/post-rewrite: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/commit-msg: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/pre-push: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/post-merge: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks/pre-commit: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state/rl23.git-hooks: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home/state: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496/home: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h/pr-poll-trace-on-26496: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pebP7h: Directory not empty

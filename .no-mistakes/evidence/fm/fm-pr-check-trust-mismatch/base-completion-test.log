@@ -1,0 +1,11 @@
+not ok - completion broke the armed PR identity the merge poll authenticates:
+window=firstmate:fm-sample-armed-review
+worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-captain-hold.y6t8E1/armed-pr-completion/projects/missing-sample-armed-review
+project=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-captain-hold.y6t8E1/armed-pr-completion/projects/sample
+harness=codex
+kind=scout
+mode=scout
+spawn_gen=fixture-sample-armed-review
+pr=https://github.com/example/sample/pull/7
+decisions_reviewed=1
+decision_keys=

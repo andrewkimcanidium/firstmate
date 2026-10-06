@@ -1,0 +1,9 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.WYBrtY
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.WYBrtY
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: project entry for /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.WYBrtY/projects/sample in /Users/andrewkim/.claude.json already declined external CLAUDE.md imports; refusing to override that consent. To recover, remove hasClaudeMdExternalIncludesApproved and hasClaudeMdExternalIncludesWarningShown from that project entry and approve the imports dialog interactively once
+error: refusing to pre-register Claude trust: could not record trust for '/Users/andrewkim/.treehouse/sample-296e21/1/sample' and project '/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.WYBrtY/projects/sample' in '/Users/andrewkim/.claude.json'
+error: could not pre-register Claude workspace trust for /Users/andrewkim/.treehouse/sample-296e21/1/sample; refusing to launch a claude worker that would wedge on the trust dialog; inspect window primary:fm-lab-scout
+error: the replacement agent for lab-scout could not be launched on claude
+error: lab-scout's agent was stopped but the replacement did not launch; no agent is running, and its work plus the recorded progress note are preserved at /Users/andrewkim/.treehouse/sample-296e21/1/sample
+RELAUNCH_RC=1

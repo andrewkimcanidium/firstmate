@@ -1,0 +1,37 @@
+not ok - a relaunch must leave an armed PR poll authenticated for the watcher
+window=fmses:fm-rl23
+endpoint_task_id=rl23
+worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/wt
+project=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/proj
+harness=claude
+kind=ship
+mode=no-mistakes
+yolo=off
+branch=fm/rl23
+tasktmp=/tmp/fm-rl23
+model=default
+effort=default
+busy_gen=g1791326521.12040.26040
+spawn_gen=s1791326521.11693.20844
+pr=https://github.com/example/repo/pull/23
+control_relaunch_tx=11290.20261006T224200Z.17366
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/pre-rebase: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/pre-applypatch: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/pre-auto-gc: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/pre-merge-commit: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/post-commit: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/sendemail-validate: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/applypatch-msg: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/prepare-commit-msg: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/post-checkout: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/post-applypatch: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/post-rewrite: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/commit-msg: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/pre-push: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/post-merge: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks/pre-commit: Permission denied
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state/rl23.git-hooks: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home/state: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516/home: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy/pr-poll-trace-off-4516: Directory not empty
+rm: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-control-relaunch.pZBMmy: Directory not empty

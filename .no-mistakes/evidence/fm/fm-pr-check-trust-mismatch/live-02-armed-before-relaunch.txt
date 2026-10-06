@@ -1,0 +1,16 @@
+--- /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.WYBrtY/state/lab-scout2.meta (mode 600)
+window=primary:fm-lab-scout2
+endpoint_task_id=lab-scout2
+worktree=/Users/andrewkim/.treehouse/sample2-350734/1/sample2
+project=/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.WYBrtY/projects/sample2
+harness=claude
+kind=scout
+tasktmp=/tmp/fm-lab-scout2
+model=default
+effort=default
+busy_gen=g1791326627.42815.22675
+spawn_gen=s1791326628.41202.25505
+pr=https://github.com/cli/cli/pull/9000
+pr_head=cc36d32a212a2b8b6611fb73549fe6d04fb6ec38
+identity_parse: OK url=https://github.com/cli/cli/pull/9000
+fm_pr_poll_artifacts_valid: AUTHENTICATED

@@ -1,0 +1,19 @@
+--- state/lab-base.meta
+window=primary:fm-lab-base
+endpoint_task_id=lab-base
+worktree=/Users/andrewkim/.treehouse/lab-base-f29441/1/lab-base
+project=/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.WYBrtY/projects/lab-base
+harness=claude
+kind=scout
+tasktmp=/tmp/fm-lab-base
+model=default
+effort=default
+busy_gen=g1791326862.2938.24567
+spawn_gen=s1791326863.2482.12361
+decisions_reviewed=1
+decision_keys=
+pr=https://github.com/cli/cli/pull/9000
+pr_head=cc36d32a212a2b8b6611fb73549fe6d04fb6ec38
+control_relaunch_tx=1337.20261006T224742Z.32679
+identity_parse: FAILED
+fm_pr_poll_artifacts_valid: REJECTED

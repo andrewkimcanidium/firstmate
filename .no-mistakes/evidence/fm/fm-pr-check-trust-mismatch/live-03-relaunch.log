@@ -1,0 +1,5 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.WYBrtY
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.WYBrtY
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+relaunched lab-scout2 harness=claude from=claude model=default effort=default backend=tmux endpoint=primary:fm-lab-scout2 worktree=/Users/andrewkim/.treehouse/sample2-350734/1/sample2
+RELAUNCH_RC=0

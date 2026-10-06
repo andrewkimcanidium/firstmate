@@ -1,0 +1,20 @@
+--- state/lab-trace.meta
+window=primary:fm-lab-trace
+endpoint_task_id=lab-trace
+worktree=/Users/andrewkim/.treehouse/lab-trace-6a54d0/1/lab-trace
+project=/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.WYBrtY/projects/lab-trace
+harness=claude
+kind=scout
+tasktmp=/tmp/fm-lab-trace
+model=default
+effort=default
+busy_gen=g1791326779.81627.17378
+spawn_gen=s1791326779.81189.1392
+control_relaunch_tx=79971.20261006T224618Z.24756
+decisions_reviewed=1
+decision_keys=
+traceparent=00-e63636e3bcb7271e04d355c717cfd692-4f442851a9d46f92-01
+pr=https://github.com/cli/cli/pull/9000
+pr_head=cc36d32a212a2b8b6611fb73549fe6d04fb6ec38
+identity_parse: OK url=https://github.com/cli/cli/pull/9000
+fm_pr_poll_artifacts_valid: AUTHENTICATED
