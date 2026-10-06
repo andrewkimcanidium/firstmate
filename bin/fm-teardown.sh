@@ -1636,7 +1636,7 @@ carried_stack_entry_valid() { # <default-branch> <tip> <base> <extra>
   [ -z "$(git -C "$WT" rev-list --merges "$base..$resolved" 2>/dev/null)" ]
 }
 carried_stack_content_in_local_default() { # <default-branch>
-  local default=$1 declaration="$CONFIG/fork-stack" branch base extra selected= declared= invalid=
+  local default=$1 declaration="$CONFIG/fork-stack" branch base extra selected='' declared='' invalid=''
   local root_common project_common tip seen='' empty_tree merged_tree target_tree
   CARRIED_STACK_REFUSAL=
   [ -f "$declaration" ] && [ -r "$declaration" ] && [ ! -L "$declaration" ] || return 1
