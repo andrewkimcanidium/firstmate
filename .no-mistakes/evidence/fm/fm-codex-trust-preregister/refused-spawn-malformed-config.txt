@@ -1,0 +1,18 @@
+cd /Users/andrewkim/.no-mistakes/worktrees/ebf490aaaabf/01M49MTYK9MTWJD6CBXN17V05H
+export TREEHOUSE_ROOT=/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.jYESJQ/treehouse CODEX_HOME=/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.jYESJQ/codex-bad
+bin/fm-spawn.sh cxtrust2 /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.jYESJQ/projects/demo --scout --harness codex > /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.jYESJQ/spawn2.out 2>&1; echo "exit=$?" >> /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.jYESJQ/spawn2.out
+
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.jYESJQ
+error: refusing to pre-register Codex workspace trust: failed to read configuration layers: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.jYESJQ/codex-bad/config.toml:1:11: unclosed array, expected `]`
+error: could not pre-register Codex workspace trust for /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.jYESJQ/treehouse/.treehouse/demo-7224b7/2/demo; refusing to launch a codex worker that would wedge on the trust dialog; inspect window primary:fm-cxtrust2
+exit=1
+--- windows after refusal
+bash bash
+fm-cxtrust1 codex
+fm-cxtrust2 zsh
+--- codex-bad/config.toml after refusal
+broken = [
+--- state files
+cxtrust1.git-hooks
+cxtrust1.meta
+home-summary.json
