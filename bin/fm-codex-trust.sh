@@ -11,10 +11,11 @@
 # changes hook trust. Relative CODEX_HOME, malformed config, explicit untrusted
 # entries, symlinked stores and foreign ownership fail closed. Existing trusted
 # entries are a no-op. Read-back verifies persistence before reporting success.
-# The private stdio server is always stopped; it never uses the shared daemon.
+# The private stdio server is always stopped (SIGKILL after a 2-second grace);
+# it never uses the shared daemon.
 set -u
 if [ "${1:-}" = --help ] || [ "${1:-}" = -h ]; then
-  sed -n '2,14{s/^# \{0,1\}//;p;}' "$0"
+  sed -n '2,15{s/^# \{0,1\}//;p;}' "$0"
   exit 0
 fi
 command -v node >/dev/null 2>&1 || { echo 'error: Codex trust requires node' >&2; exit 1; }
@@ -130,6 +131,10 @@ main().catch(error => {
   process.exitCode = 1;
 }).finally(() => {
   clearTimeout(timer);
-  if (server) { server.stdin.destroy(); server.kill('SIGTERM'); }
+  if (!server) return;
+  server.stdin.destroy();
+  server.kill('SIGTERM');
+  // A server that stalls on shutdown must not hold the verdict hostage.
+  setTimeout(() => { server.kill('SIGKILL'); server.stdout.destroy(); }, 2000).unref();
 });
 JS

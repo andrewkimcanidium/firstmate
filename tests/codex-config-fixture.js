@@ -2,6 +2,10 @@
 // Protocol fixture: JSON config stands in for Codex-owned TOML parsing.
 const fs = require('node:fs'), path = require('node:path'), rl = require('node:readline');
 const store = path.join(process.env.CODEX_HOME, 'config.toml');
+if (process.env.FM_TEST_CODEX_CONFIG_STALL) { // a server that never finishes shutting down
+  fs.writeFileSync(process.env.FM_TEST_CODEX_CONFIG_STALL, String(process.pid));
+  process.on('SIGTERM', () => {}); setInterval(() => {}, 1000);
+}
 rl.createInterface({input: process.stdin}).on('line', line => {
   const r = JSON.parse(line);
   if (r.id === undefined) return;

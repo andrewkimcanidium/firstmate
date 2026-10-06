@@ -63,6 +63,21 @@ node -e 'const fs=require("fs");const j=JSON.parse(fs.readFileSync(process.argv[
 expect_code 0 $? 'version conflict lost configuration or recorded trust'
 pass 'version conflict refuses registration and retains concurrent changes'
 
+# A server that ignores SIGTERM after the verdict must not keep the refusal waiting.
+printf 'broken = [\n' > "$CONFIG/config.toml"
+FM_TEST_CODEX_CONFIG_STALL="$TMP_ROOT/stall.pid" run_trust "$WT" "$PROJ" > "$TMP_ROOT/stall.out" &
+helper=$!
+for _ in $(seq 1 100); do kill -0 "$helper" 2>/dev/null || break; sleep 0.1; done
+if kill -0 "$helper" 2>/dev/null; then
+  kill -9 "$helper" "$(cat "$TMP_ROOT/stall.pid")" 2>/dev/null
+  fail 'helper hung on a server that stalled during shutdown'
+fi
+wait "$helper"
+expect_code 1 $? "stalled server refusal lost: $(cat "$TMP_ROOT/stall.out")"
+kill -0 "$(cat "$TMP_ROOT/stall.pid")" 2>/dev/null && fail 'stalled server was left running'
+rm "$CONFIG/config.toml"
+pass 'a server stalled on shutdown is killed and the refusal still returns'
+
 home="$TMP_ROOT/secondmate"
 fm_git_init_commit "$home"
 mkdir -p "$home/bin" "$home/data" "$home/state" "$home/config" "$home/projects"
