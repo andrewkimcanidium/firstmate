@@ -882,6 +882,16 @@ test_local_only_carried_stack_replay() {
     else
       expect_code 1 "$rc" "carried-$variant should refuse cleanup: $(cat "$case_dir/stderr")"
       assert_refusal_retained_task_state "$case_dir" "carried-$variant" "$(git -C "$case_dir/wt" rev-parse HEAD)"
+      case "$variant" in
+        undeclared|wrong-project|dirty)
+          ! grep -q 'carried-stack proof failed' "$case_dir/stderr" \
+            || fail "carried-$variant: refusal blamed a carried-stack proof that did not apply"
+          ;;
+        *)
+          grep -q 'carried-stack proof failed' "$case_dir/stderr" \
+            || fail "carried-$variant: refusal did not explain the failed carried-stack proof: $(cat "$case_dir/stderr")"
+          ;;
+      esac
     fi
   done
   pass "declared carried replay on local main allows cleanup; undeclared, dirty, unlanded, remote-only and invalid proofs refuse"

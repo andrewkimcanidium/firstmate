@@ -1618,12 +1618,15 @@ work_is_landed() {
 }
 
 # The declaration schema belongs to docs/configuration.md (carried contribution
-# stack). Only this repository's local default can prove a carried replay landed;
-# remote content, another project's same-named branch, or patch ids cannot.
+# stack) and bin/fm-fork-stack.sh. Only this repository's local default can
+# prove a carried replay landed; remote content, another project's same-named
+# branch, or patch ids cannot.
 CARRIED_STACK_BRANCH_KEEP=
+CARRIED_STACK_REFUSAL=
 carried_stack_content_in_local_default() { # <default-branch>
   local default=$1 declaration="$CONFIG/fork-stack" branch base extra selected=
   local root_common project_common tip resolved seen='' empty_tree merged_tree target_tree
+  CARRIED_STACK_REFUSAL=
   [ -f "$declaration" ] && [ -r "$declaration" ] && [ ! -L "$declaration" ] || return 1
   root_common=$(git -C "$FM_ROOT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
   project_common=$(git -C "$WT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
@@ -1636,6 +1639,7 @@ carried_stack_content_in_local_default() { # <default-branch>
     "$(git -C "$WT" rev-parse --verify HEAD 2>/dev/null)" ] || return 1
   while read -r tip base extra || [ -n "${tip:-}" ]; do
     case "${tip:-}" in ''|\#*) continue ;; esac
+    CARRIED_STACK_REFUSAL="config/fork-stack entry '$tip' is invalid (expected '<branch> <full base sha>' for an existing, merge-free local branch)"
     [ -n "${base:-}" ] && [ -z "${extra:-}" ] || return 1
     git check-ref-format "refs/heads/$tip" >/dev/null 2>&1 || return 1
     case "$tip" in "$default"|archive/*) return 1 ;; esac
@@ -1649,13 +1653,16 @@ carried_stack_content_in_local_default() { # <default-branch>
     [ -z "$(git -C "$WT" rev-list --merges "$base..$resolved" 2>/dev/null)" ] || return 1
     [ "$tip" != "$branch" ] || selected=$base
   done < "$declaration"
+  CARRIED_STACK_REFUSAL=
   [ -n "$selected" ] || return 1
+  CARRIED_STACK_REFUSAL="$branch is declared in config/fork-stack, but its change from ${selected:0:12} does not replay onto local $default without conflicts or extra content"
   target_tree=$(git -C "$WT" rev-parse --verify "refs/heads/$default^{tree}" 2>/dev/null) || return 1
   empty_tree=$(git -C "$WT" hash-object -w -t tree /dev/null) || return 1
   merged_tree=$(GIT_ATTR_NOSYSTEM=1 GIT_ATTR_SOURCE="$empty_tree" git -C "$WT" \
     -c core.attributesFile=/dev/null -c merge.renormalize=false \
     merge-tree --write-tree --merge-base="$selected" "refs/heads/$default" HEAD 2>/dev/null) || return 1
   [ "${merged_tree%%$'\n'*}" = "$target_tree" ] || return 1
+  CARRIED_STACK_REFUSAL=
   CARRIED_STACK_BRANCH_KEEP=$branch
   return 0
 }
@@ -1979,6 +1986,7 @@ validate_worktree_teardown_safety() {
       return 1
     fi
     unmerged=$(printf '%s\n' "$unmerged_raw" | head -5)
+    CARRIED_STACK_REFUSAL=
     if [ -z "$dirty" ] && [ -n "$unmerged" ] \
        && carried_stack_content_in_local_default "$DEFAULT"; then
       unmerged=
@@ -1987,6 +1995,8 @@ validate_worktree_teardown_safety() {
       echo "REFUSED: local-only worktree $WT has work not yet merged into $DEFAULT and not on any remote." >&2
       [ -n "$dirty" ] && report_worktree_dirt "$dirty"
       [ -n "$unmerged" ] && printf 'commits not yet on %s:\n%s\n' "$DEFAULT" "$unmerged" >&2
+      [ -n "$unmerged" ] && [ -n "$CARRIED_STACK_REFUSAL" ] \
+        && echo "carried-stack proof failed: $CARRIED_STACK_REFUSAL." >&2
       echo "Merge the branch into local $DEFAULT first (bin/fm-merge-local.sh after the captain approves), or push to a fork/remote, or get the captain's explicit OK to discard, then --force." >&2
       return 1
     fi
