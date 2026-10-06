@@ -898,6 +898,41 @@ test_local_only_carried_stack_replay() {
   pass "declared carried replay on local main allows cleanup; undeclared, dirty, unlanded, remote-only and invalid proofs refuse"
 }
 
+# Cleanup detaches HEAD and keeps the carried branch before returning the
+# worktree; when that return fails, a fresh teardown must re-derive the branch.
+test_local_only_carried_stack_retry_after_failed_return() {
+  local case_dir base original rc
+  case_dir=$(make_case carried-retry)
+  write_meta "$case_dir" local-only ship
+  base=$(git -C "$case_dir/wt" rev-parse HEAD)
+  wt_commit_file "$case_dir" carried.txt original "original contribution"
+  original=$(git -C "$case_dir/wt" rev-parse HEAD)
+  printf 'original\n' > "$case_dir/project/carried.txt"
+  git -C "$case_dir/project" add carried.txt
+  git -C "$case_dir/project" -c user.email=t@t -c user.name=t commit -q -m 'rebuilt stack'
+  printf 'fm/task-x1 %s\n' "$base" > "$case_dir/config/fork-stack"
+  cat > "$case_dir/fakebin/treehouse" <<SH
+#!/usr/bin/env bash
+[ -e "$case_dir/return-failed" ] && exit 0
+: > "$case_dir/return-failed"
+echo 'fatal: simulated return failure' >&2
+exit 1
+SH
+  chmod +x "$case_dir/fakebin/treehouse"
+
+  FM_TEARDOWN_TEST_ROOT="$case_dir/project" run_teardown "$case_dir" > "$case_dir/stdout" 2> "$case_dir/stderr" && rc=0 || rc=$?
+  expect_code 1 "$rc" "carried-retry: first teardown should fail on the failed return: $(cat "$case_dir/stderr")"
+  if git -C "$case_dir/wt" symbolic-ref -q HEAD >/dev/null; then
+    fail "carried-retry: first teardown did not detach HEAD before the failed return"
+  fi
+  FM_TEARDOWN_TEST_ROOT="$case_dir/project" run_teardown "$case_dir" > "$case_dir/stdout" 2> "$case_dir/stderr" && rc=0 || rc=$?
+  expect_code 0 "$rc" "carried-retry: retried teardown should accept the carried replay: $(cat "$case_dir/stderr")"
+  assert_absent "$case_dir/state/task-x1.meta" "carried-retry: retried teardown retained task metadata"
+  [ "$(git -C "$case_dir/project" rev-parse refs/heads/fm/task-x1)" = "$original" ] \
+    || fail "carried-retry: retried teardown deleted or moved the declared branch"
+  pass "carried replay teardown retried after a failed worktree return re-derives and keeps the declared branch"
+}
+
 test_no_mistakes_origin_remote_allows() {
   local case_dir rc
   case_dir=$(make_case nm-origin)
@@ -4575,6 +4610,7 @@ test_teardown_manual_backend_leaves_the_backlog_to_the_operator
 test_local_only_truly_unpushed_refuses
 test_local_only_merged_to_local_main_allows
 test_local_only_carried_stack_replay
+test_local_only_carried_stack_retry_after_failed_return
 test_no_mistakes_origin_remote_allows
 test_no_mistakes_truly_unpushed_refuses
 test_local_only_force_overrides_unpushed

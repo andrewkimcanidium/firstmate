@@ -1643,10 +1643,14 @@ carried_stack_content_in_local_default() { # <default-branch>
   root_common=$(git -C "$FM_ROOT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
   project_common=$(git -C "$WT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
   [ "$root_common" = "$project_common" ] || return 1
-  # A stale-lock retry can recheck after cleanup detached HEAD; retain the
-  # already-proven branch identity, but require its tip to still be this HEAD.
-  branch=$(git -C "$WT" symbolic-ref --quiet --short HEAD 2>/dev/null) || branch=$CARRIED_STACK_BRANCH_KEEP
-  [ -n "$branch" ] || return 1
+  # Cleanup detaches HEAD and keeps a proven carried branch before returning
+  # the worktree, so a recheck after that, in this or a later teardown, derives
+  # the branch as the one declared branch whose tip is still this HEAD.
+  if ! branch=$(git -C "$WT" symbolic-ref --quiet --short HEAD 2>/dev/null); then
+    branch=$(git -C "$WT" for-each-ref --points-at HEAD --format='%(refname:lstrip=2)' refs/heads/ 2>/dev/null \
+      | grep -Fx -f <(awk 'NF && $1 !~ /^#/ { print $1 }' "$declaration")) || return 1
+    case "$branch" in *$'\n'*) return 1 ;; esac
+  fi
   [ "$(git -C "$WT" rev-parse --verify "refs/heads/$branch" 2>/dev/null)" = \
     "$(git -C "$WT" rev-parse --verify HEAD 2>/dev/null)" ] || return 1
   while read -r tip base extra || [ -n "${tip:-}" ]; do
