@@ -291,6 +291,31 @@ Exercise the spawn behavior under test.
 EOF
 }
 
+# Wrap only Codex's config-only server; preserve the existing worker probe.
+fm_test_fake_codex_config() { # <fakebin>
+  local fakebin=$1 original nodebin
+  mkdir -p "$fakebin"
+  if [ -f "$fakebin/codex" ] && grep -q 'FM_CODEX_CONFIG_FIXTURE' "$fakebin/codex"; then
+    return 0
+  fi
+  original=$(command -v codex || true)
+  if [ -e "$fakebin/codex" ]; then
+    mv "$fakebin/codex" "$fakebin/codex-worker"
+    original="$fakebin/codex-worker"
+  fi
+  nodebin=$(command -v node)
+  cat > "$fakebin/codex" <<SH
+#!/bin/sh
+# FM_CODEX_CONFIG_FIXTURE
+if [ "\${1:-}" = app-server ]; then
+  exec '$nodebin' '$ROOT/tests/codex-config-fixture.js'
+fi
+[ -n '$original' ] || exit 0
+exec '$original' "\$@"
+SH
+  chmod +x "$fakebin/codex"
+}
+
 # fm_test_make_spawn_fakebin <dir> [extra-exit0-tool...]
 # Creates <dir>/fakebin with the spawn tmux stub, a no-op treehouse, and any
 # extra exit-0 tools. Echoes the fakebin path.
@@ -300,6 +325,7 @@ fm_test_make_spawn_fakebin() {
   fakebin=$(fm_fakebin "$dir")
   fm_test_fake_tmux_spawn "$fakebin"
   fm_fake_exit0 "$fakebin" treehouse "$@"
+  fm_test_fake_codex_config "$fakebin"
   printf '%s\n' "$fakebin"
 }
 
@@ -327,8 +353,10 @@ fm_test_run_spawn() {
   # so every launch-shape assertion in the suite keeps reading the same command.
   # A test that needs the set case opts in through FM_TEST_CLAUDE_CONFIG_DIR.
   local spawn_home=$home/user-home
+  fm_test_fake_codex_config "$fakebin"
   mkdir -p "$spawn_home"
   FM_ROOT_OVERRIDE='' FM_HOME="$home" HOME="$spawn_home" \
+    CODEX_HOME="${FM_TEST_CODEX_HOME:-$spawn_home/.codex}" \
     CLAUDE_CONFIG_DIR="${FM_TEST_CLAUDE_CONFIG_DIR:-}" \
     FM_STATE_OVERRIDE="$home/state" FM_DATA_OVERRIDE="$home/data" \
     FM_PROJECTS_OVERRIDE="$home/projects" FM_CONFIG_OVERRIDE="$home/config" \
