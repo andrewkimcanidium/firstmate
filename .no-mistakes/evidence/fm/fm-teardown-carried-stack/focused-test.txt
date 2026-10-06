@@ -1,0 +1,3 @@
+ok - local-only worktree with work merged into local main is torn down (no regression)
+ok - local-only worktree with truly unpushed work is refused (safety preserved)
+ok - declared carried replay on local main allows cleanup; undeclared, dirty, unlanded, remote-only and invalid proofs refuse

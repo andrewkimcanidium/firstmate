@@ -1,0 +1,13 @@
+== variant=replay src=a6bb60d5 task=fm-fork-stack-sync
+base=d3984190cfd8c100c5e87cef74568fb4eb327574 original=6bf84b1f2cc3b309e8d6c95662cff32c2b832e42 replay=0ef84514ea2e24a3b69d74832e2e53c3da81bea7
+fork-stack: fm/fm-fork-stack-sync d3984190cfd8c100c5e87cef74568fb4eb327574
+original on local main? no
+tmux windows before: firstmate:fm-fm-fork-stack-sync 
+$ FM_HOME=$LAB bin/fm-teardown.sh fm-fork-stack-sync
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+teardown fm-fork-stack-sync complete (window firstmate:fm-fm-fork-stack-sync, worktree $LAB/wt-sync)
+Backlog: fm-fork-stack-sync just finished (this home keeps no markdown backlog at /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.TdgCJq/data/backlog.md). Update /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.TdgCJq/data/backlog.md - move fm-fork-stack-sync to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+exit=0
+meta present after: no
+branch refs after: fm/fm-fork-stack-sync=6bf84b1 
+tmux windows after: 

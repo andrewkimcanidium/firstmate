@@ -1,0 +1,17 @@
+== variant=extra src=a6bb60d5 task=fm-fork-stack-sync
+base=d1b55e95f0c1c359fb09cdbad237196a82b3dbd2 original=b76c01487300bd9b3d52d10c8c8086ed99335043 replay=4be8bb5859dbe0c29966cc32079b770f6632c135
+fork-stack: fm/fm-fork-stack-sync d1b55e95f0c1c359fb09cdbad237196a82b3dbd2
+original on local main? no
+tmux windows before: firstmate:fm-fm-fork-stack-sync 
+$ FM_HOME=$LAB bin/fm-teardown.sh fm-fork-stack-sync
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+REFUSED: local-only worktree $LAB/wt-sync has work not yet merged into main and not on any remote.
+commits not yet on main:
+70246ad unlanded follow-up
+b76c014 fork-stack sync contribution
+carried-stack proof failed: fm/fm-fork-stack-sync is declared in config/fork-stack, but its change from d1b55e95f0c1 does not replay onto local main without conflicts or extra content.
+Merge the branch into local main first (bin/fm-merge-local.sh after the captain approves), or push to a fork/remote, or get the captain's explicit OK to discard, then --force.
+exit=1
+meta present after: yes
+branch refs after: fm/fm-fork-stack-sync=70246ad 
+tmux windows after: firstmate:fm-fm-fork-stack-sync 

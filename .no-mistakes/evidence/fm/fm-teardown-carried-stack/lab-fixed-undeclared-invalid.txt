@@ -1,0 +1,15 @@
+== variant=undeclared-invalid src=a6bb60d5 task=fm-plain-task
+base=25e519c907d71d891482bbcc99e30359ffd7535d original=6309c05ddb406dddb9166479eff5fea11462a211 replay=d8559c0e46bbb37f878e72872892ad931442fbd8
+fork-stack: fm/gone-branch 25e519c907d71d891482bbcc99e30359ffd7535d
+original on local main? no
+tmux windows before: firstmate:fm-fm-plain-task 
+$ FM_HOME=$LAB bin/fm-teardown.sh fm-plain-task
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+REFUSED: local-only worktree $LAB/wt-plain has work not yet merged into main and not on any remote.
+commits not yet on main:
+f95eca1 plain unmerged work
+Merge the branch into local main first (bin/fm-merge-local.sh after the captain approves), or push to a fork/remote, or get the captain's explicit OK to discard, then --force.
+exit=1
+meta present after: yes
+branch refs after: fm/fm-fork-stack-sync=6309c05 fm/fm-plain-task=f95eca1 
+tmux windows after: firstmate:fm-fm-plain-task 

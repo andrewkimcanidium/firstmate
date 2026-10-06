@@ -1,0 +1,15 @@
+== variant=replay src=e06a46fe task=fm-fork-stack-sync
+base=d0cd3a73943e0f1ce53a66fe0c77477c37241a40 original=908cb89dcb9b287b10bebfe63124b03bbdb5dbf2 replay=cc10ce1b57ddeca7ca81f706431b1700c08e957e
+fork-stack: fm/fm-fork-stack-sync d0cd3a73943e0f1ce53a66fe0c77477c37241a40
+original on local main? no
+tmux windows before: firstmate:fm-fm-fork-stack-sync 
+$ FM_HOME=$LAB bin/fm-teardown.sh fm-fork-stack-sync
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+REFUSED: local-only worktree $LAB/wt-sync has work not yet merged into main and not on any remote.
+commits not yet on main:
+908cb89 fork-stack sync contribution
+Merge the branch into local main first (bin/fm-merge-local.sh after the captain approves), or push to a fork/remote, or get the captain's explicit OK to discard, then --force.
+exit=1
+meta present after: yes
+branch refs after: fm/fm-fork-stack-sync=908cb89 
+tmux windows after: firstmate:fm-fm-fork-stack-sync 
