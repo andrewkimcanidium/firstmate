@@ -835,7 +835,7 @@ test_local_only_merged_to_local_main_allows() {
 
 test_local_only_carried_stack_replay() {
   local variant case_dir base original replay rc
-  for variant in replay undeclared wrong-project extra changed dirty remote-only malformed duplicate bad-base; do
+  for variant in replay undeclared undeclared-invalid wrong-project extra changed dirty remote-only malformed duplicate bad-base; do
     case_dir=$(make_case "carried-$variant")
     write_meta "$case_dir" local-only ship
     base=$(git -C "$case_dir/wt" rev-parse HEAD)
@@ -858,6 +858,7 @@ test_local_only_carried_stack_replay() {
         git -C "$case_dir/project" branch other "$original"
         printf 'other %s\n' "$base" > "$case_dir/config/fork-stack"
         ;;
+      undeclared-invalid) printf 'gone %s\n' "$base" > "$case_dir/config/fork-stack" ;;
       extra) wt_commit_file "$case_dir" extra.txt unlanded ;;
       changed) wt_commit_file "$case_dir" carried.txt unlanded ;;
       dirty) printf 'dirty\n' >> "$case_dir/wt/carried.txt" ;;
@@ -883,7 +884,7 @@ test_local_only_carried_stack_replay() {
       expect_code 1 "$rc" "carried-$variant should refuse cleanup: $(cat "$case_dir/stderr")"
       assert_refusal_retained_task_state "$case_dir" "carried-$variant" "$(git -C "$case_dir/wt" rev-parse HEAD)"
       case "$variant" in
-        undeclared|wrong-project|dirty)
+        undeclared|undeclared-invalid|wrong-project|dirty)
           ! grep -q 'carried-stack proof failed' "$case_dir/stderr" \
             || fail "carried-$variant: refusal blamed a carried-stack proof that did not apply"
           ;;

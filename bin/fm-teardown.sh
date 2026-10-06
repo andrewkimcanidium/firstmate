@@ -1623,9 +1623,21 @@ work_is_landed() {
 # branch, or patch ids cannot.
 CARRIED_STACK_BRANCH_KEEP=
 CARRIED_STACK_REFUSAL=
+carried_stack_entry_valid() { # <default-branch> <tip> <base> <extra>
+  local default=$1 tip=$2 base=$3 extra=$4 resolved
+  [ -n "$base" ] && [ -z "$extra" ] || return 1
+  git check-ref-format "refs/heads/$tip" >/dev/null 2>&1 || return 1
+  case "$tip" in "$default"|archive/*) return 1 ;; esac
+  case "$base" in *[!a-fA-F0-9]*) return 1 ;; esac
+  case "${#base}" in 40|64) ;; *) return 1 ;; esac
+  resolved=$(git -C "$WT" rev-parse --verify "refs/heads/$tip^{commit}" 2>/dev/null) || return 1
+  git -C "$WT" cat-file -e "$base^{commit}" 2>/dev/null || return 1
+  git -C "$WT" merge-base --is-ancestor "$base" "$resolved" 2>/dev/null || return 1
+  [ -z "$(git -C "$WT" rev-list --merges "$base..$resolved" 2>/dev/null)" ]
+}
 carried_stack_content_in_local_default() { # <default-branch>
-  local default=$1 declaration="$CONFIG/fork-stack" branch base extra selected=
-  local root_common project_common tip resolved seen='' empty_tree merged_tree target_tree
+  local default=$1 declaration="$CONFIG/fork-stack" branch base extra selected= declared= invalid=
+  local root_common project_common tip seen='' empty_tree merged_tree target_tree
   CARRIED_STACK_REFUSAL=
   [ -f "$declaration" ] && [ -r "$declaration" ] && [ ! -L "$declaration" ] || return 1
   root_common=$(git -C "$FM_ROOT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
@@ -1639,21 +1651,17 @@ carried_stack_content_in_local_default() { # <default-branch>
     "$(git -C "$WT" rev-parse --verify HEAD 2>/dev/null)" ] || return 1
   while read -r tip base extra || [ -n "${tip:-}" ]; do
     case "${tip:-}" in ''|\#*) continue ;; esac
-    CARRIED_STACK_REFUSAL="config/fork-stack entry '$tip' is invalid (expected '<branch> <full base sha>' for an existing, merge-free local branch)"
-    [ -n "${base:-}" ] && [ -z "${extra:-}" ] || return 1
-    git check-ref-format "refs/heads/$tip" >/dev/null 2>&1 || return 1
-    case "$tip" in "$default"|archive/*) return 1 ;; esac
-    case "$base" in *[!a-fA-F0-9]*) return 1 ;; esac
-    case "${#base}" in 40|64) ;; *) return 1 ;; esac
-    case "$seen" in *"|$tip|"*) return 1 ;; esac
+    [ "$tip" != "$branch" ] || { declared=1; selected=$base; }
+    [ -z "$invalid" ] || continue
+    case "$seen" in *"|$tip|"*) invalid=$tip; continue ;; esac
     seen="$seen|$tip|"
-    resolved=$(git -C "$WT" rev-parse --verify "refs/heads/$tip^{commit}" 2>/dev/null) || return 1
-    git -C "$WT" cat-file -e "$base^{commit}" 2>/dev/null || return 1
-    git -C "$WT" merge-base --is-ancestor "$base" "$resolved" 2>/dev/null || return 1
-    [ -z "$(git -C "$WT" rev-list --merges "$base..$resolved" 2>/dev/null)" ] || return 1
-    [ "$tip" != "$branch" ] || selected=$base
+    carried_stack_entry_valid "$default" "$tip" "${base:-}" "${extra:-}" || invalid=$tip
   done < "$declaration"
-  CARRIED_STACK_REFUSAL=
+  if [ -n "$invalid" ]; then
+    [ -z "$declared" ] \
+      || CARRIED_STACK_REFUSAL="config/fork-stack entry '$invalid' is invalid (expected '<branch> <full base sha>' for an existing, merge-free local branch)"
+    return 1
+  fi
   [ -n "$selected" ] || return 1
   CARRIED_STACK_REFUSAL="$branch is declared in config/fork-stack, but its change from ${selected:0:12} does not replay onto local $default without conflicts or extra content"
   target_tree=$(git -C "$WT" rev-parse --verify "refs/heads/$default^{tree}" 2>/dev/null) || return 1
