@@ -1,0 +1,14 @@
+## fm-spawn.sh trustrefuse with malformed CODEX_HOME/config.toml
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.4TiLk6
+error: refusing to pre-register Codex workspace trust: failed to read configuration layers: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.4TiLk6/codex/config.toml:1:11: unclosed array, expected `]`
+error: could not pre-register Codex workspace trust for /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.4TiLk6/th/.treehouse/proj-962ca2/1/proj; refusing to launch a codex worker that would wedge on the trust dialog; inspect window primary:fm-trustrefuse
+exit=1
+## config.toml after refusal (unchanged)
+broken = [
+## lab tmux windows
+primary:bash bash
+primary:fm-trustlive codex
+primary:refuser bash
+primary:fm-trustrefuse zsh
+## state/trustrefuse.meta
+cat: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.4TiLk6/state/trustrefuse.meta: No such file or directory

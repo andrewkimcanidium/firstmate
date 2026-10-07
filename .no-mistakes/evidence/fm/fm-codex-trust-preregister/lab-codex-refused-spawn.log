@@ -1,0 +1,10 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.qqvN3u
+warning: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.qqvN3u/data/codexrefuse/launch-brief.md records no ship branch; defaulting to legacy branch fm/codexrefuse
+warning: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.qqvN3u/data/codexrefuse/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+notice: codexrefuse ships mode=local-only while the standing posture for proj is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+error: refusing to pre-register Codex workspace trust: failed to read configuration layers: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.qqvN3u/codex/config.toml:1:11: unclosed array, expected `]`
+error: could not pre-register Codex workspace trust for /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.qqvN3u/wt2; refusing to launch a codex worker that would wedge on the trust dialog; inspect window primary:fm-codexrefuse
+SPAWN_EXIT=1
+primary:0: bash* (1 panes) [160x45] 
+primary:1: fm-codexlive (1 panes) [160x45] 
+primary:2: fm-codexrefuse (1 panes) [160x45] 

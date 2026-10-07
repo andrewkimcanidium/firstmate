@@ -1,0 +1,32 @@
+codex used for trust: /opt/homebrew/bin/codex (codex-cli 0.159.3)
+
+== fm-spawn.sh realtrust <project> --harness codex (real codex app-server registers trust)
+warning: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-real-spawn-drive.ZXNHfW/fm-home/data/realtrust/launch-brief.md records no ship branch; defaulting to legacy branch fm/realtrust
+warning: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-real-spawn-drive.ZXNHfW/fm-home/data/realtrust/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+spawned realtrust harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-realtrust worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-real-spawn-drive.ZXNHfW/worktree
+spawn exit=0
+
+== isolated CODEX_HOME/config.toml after spawn:
+[projects."/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-real-spawn-drive.ZXNHfW/worktree"]
+trust_level = "trusted"
+
+== launch command recorded for the pane (CODEX_HOME forwarded):
+CODEX_HOME='/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-real-spawn-drive.ZXNHfW/codex-home'
+
+== real codex TUI launched in the spawned worktree vs the primary checkout
+primary checkout (never registered): trust prompt shown=True; reached composer=True
+spawned worktree: trust prompt shown=False; reached composer=True
+
+== adversarial: config marks the worktree explicitly untrusted, then spawn again
+warning: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-real-spawn-drive.ZXNHfW/fm-home/data/untrusted/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+error: refusing to pre-register Codex workspace trust: existing entry for /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-real-spawn-drive.ZXNHfW/worktree is explicitly untrusted
+error: could not pre-register Codex workspace trust for /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-real-spawn-drive.ZXNHfW/worktree; refusing to launch a codex worker that would wedge on the trust dialog; inspect window firstmate:fm-untrusted
+spawn exit=1
+no launch recorded: worker NOT launched
+
+== adversarial: codex not installed (PATH has no codex)
+(no codex on PATH)
+error: refusing to pre-register Codex workspace trust: spawn codex ENOENT
+error: could not pre-register Codex workspace trust for /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-real-spawn-drive.ZXNHfW/worktree; refusing to launch a codex worker that would wedge on the trust dialog; inspect window firstmate:fm-nocodex
+spawn exit=1
+no launch recorded: worker NOT launched

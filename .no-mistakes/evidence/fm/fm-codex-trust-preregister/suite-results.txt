@@ -1,0 +1,5 @@
+fm-test-fixture-cleanup rc=0
+fm-codex-trust rc=0
+fm-live-gate rc=0
+fm-spawn-worktree-settle rc=0
+fm-secondmate-lifecycle-e2e rc=0

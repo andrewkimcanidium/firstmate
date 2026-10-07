@@ -1,0 +1,21 @@
+# claude 2.1.285 (Claude Code): title='claude' foreground=[/opt/homebrew/bin/claude ]
+ok - harness liveness: claude 2.1.285 (Claude Code) classifies alive
+# claude 2.1.285 (Claude Code): ancestry verdicts=[comm claude]
+ok - harness detection: claude 2.1.285 (Claude Code) is identified by the ancestry walk at comm strength
+# codex codex-cli 0.159.3: title='codex' foreground=[/opt/homebrew/bin/codex ]
+ok - harness liveness: codex codex-cli 0.159.3 classifies alive
+# codex codex-cli 0.159.3: ancestry verdicts=[comm codex]
+ok - harness detection: codex codex-cli 0.159.3 is identified by the ancestry walk at comm strength
+# skip: opencode is not installed on this machine, so its classification is unverified here
+# pi 0.87.1: title='node' foreground=[pi fd ]
+ok - harness liveness: pi 0.87.1 classifies alive
+# pi 0.87.1: ancestry verdicts=[comm pi]
+ok - harness detection: pi 0.87.1 is identified by the ancestry walk at comm strength
+# skip: pi-signed is not installed on this machine, so its classification is unverified here
+# skip: grok is not installed on this machine, so its classification is unverified here
+# skip: kimi is not installed on this machine, so its classification is unverified here
+# skip: cursor is not installed on this machine, so its classification is unverified here
+# skip: muse is not installed on this machine, so its classification is unverified here
+# unverified on this machine (not installed): opencode pi-signed grok kimi cursor muse
+# checked 3 installed harness(es)
+exit=0

@@ -1,0 +1,40 @@
+$ fm-codex-trust.sh <linked worktree> <project>   # happy path
+trusted: /private/tmp/fm-adv.psuA/wt
+exit=0
+[projects."/private/tmp/fm-adv.psuA/wt"]
+trust_level = "trusted"
+
+$ fm-codex-trust.sh <primary checkout> <project>
+error: refusing to pre-register Codex workspace trust: /private/tmp/fm-adv.psuA/proj is a primary checkout, not an isolated worktree
+exit=1
+
+$ fm-codex-trust.sh <ancestor tmp root> <project>
+error: refusing to pre-register Codex workspace trust: Command failed: git -C /private/tmp/fm-adv.psuA rev-parse --show-toplevel
+exit=1
+
+$ fm-codex-trust.sh <worktree> <unrelated project>
+error: refusing to pre-register Codex workspace trust: /private/tmp/fm-adv.psuA/wt is not a worktree of /tmp/fm-adv.psuA/other
+exit=1
+
+$ fm-codex-trust.sh $HOME <project>
+error: refusing to pre-register Codex workspace trust: /Users/andrewkim is not a task launch directory
+exit=1
+
+$ fm-codex-trust.sh <worktree explicitly untrusted in config> <project>
+error: refusing to pre-register Codex workspace trust: existing entry for /private/tmp/fm-adv.psuA/wt2 is explicitly untrusted
+exit=1
+
+$ CODEX_HOME=relative fm-codex-trust.sh <wt> <project>
+error: refusing to pre-register Codex workspace trust: CODEX_HOME must be absolute so registration and launch read the same store
+exit=1
+
+$ CODEX_HOME=<dir whose config.toml is a symlink> fm-codex-trust.sh <wt> <project>
+error: refusing to pre-register Codex workspace trust: /private/tmp/fm-adv.psuA/c2/config.toml must be a regular file owned by this user
+exit=1
+x=1
+
+final isolated config.toml:
+[projects."/private/tmp/fm-adv.psuA/wt"]
+trust_level = "trusted"
+[projects."/private/tmp/fm-adv.psuA/wt2"]
+trust_level = "untrusted"

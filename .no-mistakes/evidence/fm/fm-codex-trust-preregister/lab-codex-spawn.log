@@ -1,0 +1,6 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.qqvN3u
+warning: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.qqvN3u/data/codexlive/launch-brief.md records no ship branch; defaulting to legacy branch fm/codexlive
+warning: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.qqvN3u/data/codexlive/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+notice: codexlive ships mode=local-only while the standing posture for proj is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned codexlive harness=codex kind=ship mode=local-only yolo=off window=primary:fm-codexlive worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.qqvN3u/wt
+SPAWN_EXIT=0

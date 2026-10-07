@@ -1,0 +1,11 @@
+Command: bash tests/fm-remote-secondmate-parent-binding.test.sh   (HEAD 7e8a72b2, exit=0, all checks ok)
+Before: shasum ~/.codex/config.toml recorded.
+After:  ~/.codex/config.toml CHANGED - a new block appeared in the operator's REAL Codex store:
+  [projects."/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-remote-parent-binding.M2qcPN/remote-home"]
+  trust_level = "trusted"
+(The tester removed exactly this block afterwards. Three similar entries from earlier runs of
+fm-remote-parent-binding, fm-remote-secondmate-e2e and fm-remote-trace-context were already present and were left untouched.)
+Cause: bin/fm-remote-entrypoint.sh runs `unset HOME`, resolves ACCOUNT_HOME from `cd ~` (passwd entry),
+composes an operator PATH (/opt/homebrew/bin etc.), and re-execs the remote job under `env -i` with HOME=$ACCOUNT_HOME.
+The suite-private CODEX_HOME and config-only codex wrapper that tests/lib.sh exports therefore never reach
+the remote secondmate spawn; bin/fm-codex-trust.sh runs the real codex against the real ~/.codex.
