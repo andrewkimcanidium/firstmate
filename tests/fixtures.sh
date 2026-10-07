@@ -291,31 +291,6 @@ Exercise the spawn behavior under test.
 EOF
 }
 
-# Wrap only Codex's config-only server; preserve the existing worker probe.
-fm_test_fake_codex_config() { # <fakebin>
-  local fakebin=$1 original nodebin
-  mkdir -p "$fakebin"
-  if [ -f "$fakebin/codex" ] && grep -q 'FM_CODEX_CONFIG_FIXTURE' "$fakebin/codex"; then
-    return 0
-  fi
-  original=$(command -v codex || true)
-  if [ -e "$fakebin/codex" ]; then
-    mv "$fakebin/codex" "$fakebin/codex-worker"
-    original="$fakebin/codex-worker"
-  fi
-  nodebin=$(command -v node)
-  cat > "$fakebin/codex" <<SH
-#!/bin/sh
-# FM_CODEX_CONFIG_FIXTURE
-if [ "\${1:-}" = app-server ]; then
-  exec '$nodebin' '$ROOT/tests/codex-config-fixture.js'
-fi
-[ -n '$original' ] || exit 0
-exec '$original' "\$@"
-SH
-  chmod +x "$fakebin/codex"
-}
-
 # fm_test_make_spawn_fakebin <dir> [extra-exit0-tool...]
 # Creates <dir>/fakebin with the spawn tmux stub, a no-op treehouse, and any
 # extra exit-0 tools. Echoes the fakebin path.
