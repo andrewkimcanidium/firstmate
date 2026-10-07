@@ -1,0 +1,18 @@
+=== BEFORE (base 237e1cf3) fm_dod_block no-mistakes ===
+# Definition of done
+Delivery contract: mode=no-mistakes
+Ship branch: fm/selfval-nm
+The task is complete only when committed on your branch.
+When you believe it is complete, append `done [at=<epoch>]: {summary}` to the status file and stop.
+Firstmate will then instruct you to run /no-mistakes to validate and ship a PR.
+That first `done:` is the handoff that starts the pipeline, which owns the push; it is not a request to push from this copy.
+
+=== AFTER (f8ff9a83) ===
+# Definition of done
+Delivery contract: mode=no-mistakes
+Ship branch: fm/selfval-nm
+The task is complete only when committed on your branch.
+Once your work is committed and your own checks pass, run /no-mistakes yourself to validate and ship a PR; the pipeline owns the push.
+Do not report done or stop before validation reaches the CI-ready outcome, unless the status protocol requires a decision, blocker, or wait.
+
+You drive no-mistakes by responding to its gates, not by implementing fixes.
