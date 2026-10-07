@@ -310,6 +310,23 @@ SH
   chmod +x "$fakebin/codex"
 }
 
+# fm_test_remote_codex_config <remote-root>: the remote job runs every command
+# under env -i with the real account HOME, so neither the suite CODEX_HOME nor
+# PATH reaches it. Its child PATH starts at <remote-root>/bin; a codex there
+# answers app-server with the fixture, persisting into the suite store.
+fm_test_remote_codex_config() { # <remote-root>
+  local script="$1/bin/codex"
+  mkdir -p "$1/bin"
+  cat > "$script" <<SH
+#!/bin/sh
+if [ "\${1:-}" = app-server ]; then
+  FM_TEST_CODEX_STORE='$CODEX_HOME/config.toml' exec '$(command -v node)' '$ROOT/tests/codex-config-fixture.js'
+fi
+exit 0
+SH
+  chmod +x "$script"
+}
+
 # Every codex spawn pre-registers workspace trust through `codex app-server`
 # (bin/fm-codex-trust.sh). Give each suite a private CODEX_HOME and the
 # config-only fixture so no spawn under test needs an installed codex or writes
