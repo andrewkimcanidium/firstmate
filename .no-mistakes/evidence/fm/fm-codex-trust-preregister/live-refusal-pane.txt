@@ -1,0 +1,8 @@
+ T/fm-lab.xTBUN3/projects/alpha    main
+❯ treehouse get
+🌳 Setting up worktree...
+🌳 Entered worktree at /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.xTBUN3/treehouse/.treehouse/alpha-b18597/2/alpha. Type 'exit' to return.
+ .treehouse/alpha-b18597/2/alpha    HEAD
+❯ cd -- '/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.xTBUN3/treehouse/.treehouse/alpha-b18597/2/alpha'
+ .treehouse/alpha-b18597/2/alpha    HEAD
+❯

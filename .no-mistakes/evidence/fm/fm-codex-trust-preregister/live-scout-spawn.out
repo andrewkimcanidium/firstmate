@@ -1,0 +1,4 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.xTBUN3
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+spawned scout1 harness=codex kind=scout window=primary:fm-scout1 worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.xTBUN3/treehouse/.treehouse/alpha-b18597/1/alpha
+SPAWN_EXIT=0

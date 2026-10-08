@@ -1,0 +1,5 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.xTBUN3
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: refusing to pre-register Codex workspace trust: failed to read configuration layers: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.xTBUN3/codex-broken/config.toml:1:11: unclosed array, expected `]`
+error: could not pre-register Codex workspace trust for /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.xTBUN3/treehouse/.treehouse/alpha-b18597/2/alpha; refusing to launch a codex worker that would wedge on the trust dialog; inspect window primary:fm-scout2
+SPAWN_EXIT=1
