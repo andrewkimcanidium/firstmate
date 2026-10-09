@@ -12,10 +12,12 @@
 # refused before the store is touched - and a claim that names no task (a
 # heartbeat review, or a claimed heartbeat or check row) is unscoped. The
 # claimed task set comes from .pi/extensions/lib/fm-branch-dispatch.ts through
-# the host's turn record; this script only compares against it.
+# the host's turn record; this script accepts a task name directly or resolves
+# an endpoint against only that claimed task set, refusing an ambiguous match
+# before touching the store.
 #
 # Usage:
-#   fm-branch-report.sh --task <id|fleet> --verdict routine|captain \
+#   fm-branch-report.sh --task <task-name|endpoint|fleet> --verdict routine|captain \
 #       --summary <text> [--silent true|false] [--wake <text>]
 #
 # The verdict criteria are owned by bin/fm-branch-prompt.sh ("Verdict: routine
@@ -52,6 +54,8 @@ TURN_FILE="$STATE/.supervision-host-turn"
 RECEIPTS="$STATE/.supervision-host-receipts"
 # shellcheck source=bin/fm-afk-contract.sh
 . "$SCRIPT_DIR/fm-afk-contract.sh"
+# shellcheck source=bin/fm-backend.sh
+. "$SCRIPT_DIR/fm-backend.sh"
 
 usage() {
   sed -n '/^# Usage:/,/^# --wake/p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//' >&2
@@ -107,6 +111,25 @@ turn_field() {  # <name>
 
 if [ "$(turn_field unscoped)" != 1 ]; then
   TASKS=$(turn_field tasks)
+  # A stale wake displays the endpoint, but outcomes and receipts use the task
+  # name. Only the turn's claimed tasks may supply aliases, never the fleet.
+  case " $TASKS " in
+    *" $TASK "*) ;;
+    *)
+      matched='' matches=0
+      for candidate in $TASKS; do
+        meta="$STATE/$candidate.meta"
+        [ -f "$meta" ] && [ ! -L "$meta" ] || continue
+        endpoint=$(fm_backend_target_of_meta "$meta")
+        if [ -n "$endpoint" ] && [ "$endpoint" = "$TASK" ]; then
+          matched=$candidate
+          matches=$(( matches + 1 ))
+        fi
+      done
+      [ "$matches" -le 1 ] || refuse "endpoint $TASK names more than one task in this wake; report the task name"
+      [ "$matches" -ne 1 ] || TASK=$matched
+      ;;
+  esac
   case " $TASKS " in
     *" $TASK "*) ;;
     *)
