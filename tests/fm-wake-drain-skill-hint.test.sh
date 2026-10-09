@@ -54,9 +54,15 @@ test_procevent_check_names_process_event_sources() {
 }
 
 test_relay_check_names_fmx_respond() {
-  drain_case relay '' '' check /home/bin/fm-x-poll.sh 'check: /home/bin/fm-x-poll.sh: x-mention r1'
-  assert_hint_after "$(printf '\tcheck\t/home/bin/fm-x-poll.sh\t')" 'load: fmx-respond'
+  drain_case relay '' '' check /home/state/x-watch.check.sh 'check: /home/state/x-watch.check.sh: x-mention r1'
+  assert_hint_after "$(printf '\tcheck\t/home/state/x-watch.check.sh\t')" 'load: fmx-respond'
   pass "a Relay mention check wake names fmx-respond beside its row"
+}
+
+test_contributions_check_names_bearings() {
+  drain_case contributions '' '' check contribution-0a1b2c 'check: contributions task8 0a1b2c'
+  assert_hint_after "$(printf '\tcheck\tcontribution-0a1b2c\t')" 'load: bearings'
+  pass "a contributions check wake names bearings beside its row"
 }
 
 test_ready_pr_signal_names_ship_landing() {
@@ -98,6 +104,7 @@ test_unmapped_wakes_print_no_hint() {
 test_stale_wake_names_stuck_crewmate_recovery
 test_procevent_check_names_process_event_sources
 test_relay_check_names_fmx_respond
+test_contributions_check_names_bearings
 test_ready_pr_signal_names_ship_landing
 test_ready_branch_signal_names_ship_landing
 test_scout_done_signal_names_scout_completion

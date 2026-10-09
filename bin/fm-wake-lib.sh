@@ -2769,7 +2769,8 @@ fm_wake_skill_hint() {  # row <kind> <key> <payload> | status <state> <status-ke
       case "$2:$3" in
         stale:*) skills=stuck-crewmate-recovery ;;
         check:procevent:*) skills=process-event-sources ;;
-        check:*/fm-x-poll.sh) skills=fmx-respond ;;
+        check:*/x-watch.check.sh) skills=fmx-respond ;;
+        check:contribution-*) skills=bearings ;;
       esac
       ;;
     status)
