@@ -1,0 +1,9 @@
+ok - a stale wake names stuck-crewmate-recovery beside its row
+ok - a procevent check wake names process-event-sources beside its row
+ok - a Relay mention check wake names fmx-respond beside its row
+ok - a contributions check wake names bearings beside its row
+ok - a ready-PR signal names ship-landing beside its status line
+ok - a ready local branch signal names ship-landing beside its status line
+ok - a scout's done signal names scout-completion beside its status line
+ok - an ask-user finding signal names ask-user-authority and validation-supervision
+ok - wakes with no mapped skill print no hint

@@ -1,0 +1,11 @@
+hold exit=0
+=== fm-captain-hold.sh diverged ===
+sample-route-call	sample-route-review	sample-route-call	Choose route: north or south
+=== fm-wake-drain.sh RECORD DIVERGENCE section ===
+RECORD DIVERGENCE (answered in the status log, still held in the backlog - nothing was closed automatically):
+sample-route-call [key=sample-route-call] reads resolved in sample-route-review's status log but is still held for the captain: Choose route: north or south
+load: captain-hold-lifecycle
+RECORD DIVERGENCE: reconcile each one - record the captain's own words with bin/fm-captain-hold.sh answer <task> --decision-file <path>, or re-open the status decision when that resolution was not the captain's word.
+=== agreeing records: no divergence, no hint ===
+0
+lab removed: yes

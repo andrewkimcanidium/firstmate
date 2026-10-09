@@ -1,0 +1,51 @@
+=== fm-wake-drain.sh (lab FM_HOME) ===
+1791519177	1	stale	fm:stuckd	stale: fm:stuckd
+load: stuck-crewmate-recovery
+1791519177	2	check	procevent:board:7	check: procevent lavish board 7
+load: process-event-sources
+1791519177	3	check	/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.VGPLcU/state/x-watch.check.sh	check: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.VGPLcU/state/x-watch.check.sh: x-mention r1
+load: fmx-respond
+1791519177	4	check	contribution-0a1b2c3d	check: contributions taskq 0a1b2c3d
+load: bearings
+1791519177	5	check	/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.VGPLcU/state/other.check.sh	check: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.VGPLcU/state/other.check.sh: merged
+1791519177	6	heartbeat	heartbeat	heartbeat
+1791519177	7	signal	shipa.status	signal: shipa.status
+1791519177	8	signal	shipb.status	signal: shipb.status
+1791519177	9	signal	scouty.status	signal: scouty.status
+1791519177	10	signal	valc.status	signal: valc.status
+1791519177	11	signal	plain.status	signal: plain.status
+1791519178	12	signal	preship.status	signal: preship.status
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 12 --recovery-generation 78786.1791519177.BrLC4V
+wake annotation: latest wake-EVENT observed at drain, not current state: shipa.status: done: PR https://github.com/o/r/pull/9 checks green
+load: ship-landing
+wake annotation: latest wake-EVENT observed at drain, not current state: shipb.status: done: ready in branch fm/shipb
+load: ship-landing
+wake annotation: latest wake-EVENT observed at drain, not current state: scouty.status: done: report written to data/scouty/report.md
+load: scout-completion
+wake annotation: latest wake-EVENT observed at drain, not current state: valc.status: needs-decision [key=nm-1-review]: ask-user findings=f1 file=/x/f.txt
+load: ask-user-authority, validation-supervision
+wake annotation: latest wake-EVENT observed at drain, not current state: plain.status: working: setup complete
+wake annotation: latest wake-EVENT observed at drain, not current state: preship.status: done: implemented and committed
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+preship done: implemented and committed
+scouty done: report written to data/scouty/report.md
+shipa done: PR https://github.com/o/r/pull/9 checks green
+shipb done: ready in branch fm/shipb
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+valc [key=nm-1-review] needs-decision: ask-user findings=f1 file=/x/f.txt
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+exit=0
+=== second drain (queue consumed) ===
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 12 --recovery-generation 78786.1791519177.BrLC4V
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+4
+lab removed: yes
