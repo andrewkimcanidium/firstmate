@@ -2758,8 +2758,8 @@ fm_wake_latest_event() {  # <validated-status-path> <tail-byte-cap>
 }
 
 # Print the "load: <skill>" hint the drain shows beside a presented wake: the
-# agent-only skill AGENTS.md section 8 (or that skill's own description) says to
-# load before acting on it. This table is the single owner of that mapping in
+# agent-only skill AGENTS.md (or that skill's own description) says to load
+# before acting on it. This table is the single owner of that mapping in
 # drain output; it names a skill only where those sources make the mapping
 # explicit, and prints nothing for any other wake.
 fm_wake_skill_hint() {  # row <kind> <key> <payload> | status <state> <status-key> <line> | divergence
