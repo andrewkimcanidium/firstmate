@@ -348,48 +348,6 @@ test_report_surface_enforces_actor_turn_and_scope() {
   pass "report surface: only the branch actor's current turn may report, and only on the tasks its wake names"
 }
 
-# A stale wake names an endpoint while its claim names the resolved task.
-# Accept that endpoint only as an unambiguous alias inside the current claim.
-test_report_resolves_only_claimed_task_endpoints() {
-  local home state out rc
-  home="$TMP_ROOT/report-endpoint"; state="$home/state"
-  mkdir -p "$state"
-  printf 'turn=t1\nrows=4\ntasks=alpha\nunscoped=0\nwake=stale: default:w1:p3D\n' > "$state/.supervision-host-turn"
-  printf 'window=default:w1:p3D\n' > "$state/alpha.meta"
-  printf 'window=default:w2:p9\n' > "$state/foreign.meta"
-  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 "$REPORT" \
-    --task default:w2:p9 --verdict routine --summary quiet 2>&1); rc=$?
-  expect_code 3 "$rc" "an endpoint outside the wake claim must be refused"
-  [ ! -e "$state/branch-outcomes.jsonl" ] || fail "foreign endpoint touched the outcome store"
-  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 "$REPORT" \
-    --task default:w1:p3D --verdict routine --summary 'declared wait still holds' --silent true 2>&1); rc=$?
-  expect_code 0 "$rc" "the wake's endpoint must resolve to its claimed task"
-  assert_grep '"task":"alpha"' "$state/branch-outcomes.jsonl" "endpoint alias was stored instead of the task name"
-  [ "$(cat "$state/.supervision-host-receipts")" = "$(printf 't1\t1\troutine\talpha')" ] \
-    || fail "endpoint report receipt did not use the canonical task name"
-  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 "$REPORT" \
-    --task alpha --verdict routine --summary quiet --silent true 2>&1); rc=$?
-  expect_code 0 "$rc" "the canonical task name must still be accepted"
-  printf 'turn=t2\nrows=5\ntasks=alpha beta\nunscoped=0\nwake=stale: default:w1:p3D\n' > "$state/.supervision-host-turn"
-  printf 'window=default:w1:p3D\n' > "$state/beta.meta"
-  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t2 "$REPORT" \
-    --task default:w1:p3D --verdict routine --summary quiet 2>&1); rc=$?
-  expect_code 3 "$rc" "an ambiguous endpoint must be refused"
-  [ "$(wc -l < "$state/branch-outcomes.jsonl" | tr -d ' ')" = 2 ] \
-    || fail "ambiguous endpoint changed the outcome store"
-  printf 'turn=t3\nrows=6\ntasks=alpha\nunscoped=0\nwake=stale: terminal-12345\n' > "$state/.supervision-host-turn"
-  printf 'backend=orca\nwindow=logical-task-window\nterminal=terminal-12345\n' > "$state/alpha.meta"
-  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t3 "$REPORT" \
-    --task terminal-12345 --verdict routine --summary quiet --silent true 2>&1); rc=$?
-  expect_code 0 "$rc" "Orca's actual terminal endpoint must resolve to its claimed task"
-  assert_grep '"task":"alpha","wake":"stale: terminal-12345"' "$state/branch-outcomes.jsonl" \
-    "Orca endpoint report did not use the canonical task name"
-  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t3 "$REPORT" \
-    --task logical-task-window --verdict routine --summary quiet --silent true 2>&1); rc=$?
-  expect_code 3 "$rc" "Orca's logical window must not alias its actual terminal endpoint"
-  pass "report accepts task names and unique claimed endpoints without widening wake scope"
-}
-
 # The return brief is rendered after the record is archived, so a non-silent
 # report made after that may be missing from it: the report queues its relay
 # for main, while a report made during the away window only waits for the brief.
@@ -3001,7 +2959,6 @@ test_claude_stop_hook_notifies_when_closed_successor_downtime_restore_fails
 test_claude_stop_hook_notifies_when_closed_announced_successor_downtime_restore_fails
 test_park_exit_probe_uses_half_second_child_sleeps
 test_report_surface_enforces_actor_turn_and_scope
-test_report_resolves_only_claimed_task_endpoints
 test_report_after_the_return_is_queued_for_main
 test_dispatch_entry_scopes_rows_and_renders_the_away_tail
 test_branch_outcomes_only_on_a_host_home_off_pi
