@@ -1,0 +1,9 @@
+wake drain: acknowledged 1 row(s) through 1
+wake drain: acknowledged 1 row(s) through 2
+ok - away paused waits hand off once per declaration despite pane churn, and re-arm on replacement or resume
+ok - with .afk present the watcher reverts to one-shot so the daemon owns triage (no double-triage)
+wake drain: acknowledged 0 row(s) through 0
+ok - a captain-held item is never rechecked while the away-posture record exists, and the recheck returns once the record is archived
+ok - the daemon-owned one-shot never hands off a captain-held pane while the away-posture record exists
+wake drain: acknowledged 1 row(s) through 1
+ok - a declared wait whose until time has passed is rechecked at once, then held to the cadence

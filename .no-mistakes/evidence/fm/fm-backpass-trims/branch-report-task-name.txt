@@ -1,0 +1,21 @@
+# turn record (disposable FM_HOME):
+turn=t1
+rows=1
+tasks=alpha
+unscoped=0
+wake=stale: fm-alpha (endpoint w7:p3)
+$ FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 bin/fm-branch-report.sh --task w7:p3 --verdict routine --summary 'worker parked on declared wait'
+report refused: the wake being handled (row 1) names alpha, not w7:p3; report only that task, never fleet or a task from memory
+exit=3
+$ FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 bin/fm-branch-report.sh --task fm-alpha --verdict routine --summary 'worker parked on declared wait'
+report refused: the wake being handled (row 1) names alpha, not fm-alpha; report only that task, never fleet or a task from memory
+exit=3
+$ FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 bin/fm-branch-report.sh --task alpha --verdict routine --summary 'worker parked on declared wait'
+recorded seq 1 [routine]; the captain has returned, so it is queued for MAIN to relay
+exit=0
+# outcome store:
+{"seq":1,"epoch":1791570226,"task":"alpha","wake":"stale: fm-alpha (endpoint w7:p3)","verdict":"routine","summary":"worker parked on declared wait","silent":false,"statusEndpoint":0,"statusIdent":"-"}
+
+# emitted branch system prompt, step 4 and intake rule (bin/fm-branch-prompt.sh stdout):
+23:4. Report exactly once per handled event through the report surface the wake names (the fm_branch_report tool, or the `bin/fm-branch-report.sh` command), with the task name resolved from the wake's status path or recorded endpoint metadata, never its endpoint/window id, the verdict, and a one-or-two-sentence summary; set silent true only for a routine no-change outcome as defined under "Verdict: routine or captain" below.
+97:Before any authorized dispatch, load `.agents/skills/task-intake/SKILL.md` and its matched-array quota owner; the same intake safety boundaries apply in this posture.

@@ -1,0 +1,30 @@
+=== run 1: wrong recovery generation then repeat (pre-existing diagnostic path) ===
+$ (append 3 wakes via fm_wake_append)
+$ bin/fm-wake-drain.sh
+1791570196	1	stale	test:w1	stale: test:w1
+1791570196	2	stale	test:w2	stale: test:w2
+1791570196	3	stale	test:w3	stale: test:w3
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 61048.1791570196.z4qG8h
+$ bin/fm-wake-drain.sh --ack-through 3 --recovery-generation bogus-gen   # adversarial: wrong generation
+wake drain: acknowledged wakes through 3 (3 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+exit=0
+$ bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 61048.1791570196.z4qG8h
+wake drain: acknowledged 0 row(s) through 3
+exit=0
+$ wc -c state/.wake-queue
+       0
+$ bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 61048.1791570196.z4qG8h   # repeat ack
+wake drain: acknowledged 0 row(s) through 3
+exit=0
+=== run 2: correct acknowledgement (fresh disposable state) ===
+$ bin/fm-wake-drain.sh
+1791570212	1	stale	test:w1	stale: test:w1
+1791570212	2	stale	test:w2	stale: test:w2
+1791570212	3	stale	test:w3	stale: test:w3
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 71643.1791570212.ulGIOS
+$ bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 71643.1791570212.ulGIOS
+wake drain: acknowledged 3 row(s) through 3
+exit=0
+queue bytes after ack:        0
+$ bin/fm-wake-drain.sh --ack-through 3   # adversarial: no generation
+exit=2

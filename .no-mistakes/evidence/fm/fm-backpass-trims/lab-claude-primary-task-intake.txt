@@ -1,0 +1,20 @@
+ ▐▛███▛█   Claude Code v2.1.286
+▝▜██████▀  Opus 5.5 · Claude Team
+ ▝▝   ▝▝   ~/.no-mistakes/worktrees/ebf490aaaabf/01M4GWN56J87RH10DYGJWSQVRW
+❯ Question only, take no action and run no commands: a captain asks you to start a new ship task in a registered project. Per your always-loaded AGENTS.md, which skill must you load before resolving
+  that task's delivery mode, yolo posture, branch prefix, and filling its brief, and which skill does that one hand matched profile-array selection to? Then read that skill's SKILL.md and quote its
+  first heading.
+  Read 1 file
+⏺ Captain, here's the answer. I only read the one file you asked about and ran no commands.
+  - Skill to load first: task-intake. AGENTS.md section 4 says to load it before every task intake, dispatch-profile selection, delivery resolution, or brief authoring. Section 7 repeats that for
+    resolving delivery, merge posture, or branches, and section 11 for filling or revising a brief.
+  - Skill it hands matched profile arrays to: quota-array-dispatch. Section 4 says task-intake "loads quota-array-dispatch for matched profile arrays". The task-intake SKILL.md backs this up at
+    .agents/skills/task-intake/SKILL.md:15: it names quota-array-dispatch as "the single owner of matched-array selection" and says to load it before choosing among a matched profile array.
+  - First heading of .agents/skills/task-intake/SKILL.md: line 11, after the frontmatter:
+  ▎ # Task intake
+✻ Sautéed for 8s · done 1:26 PM
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    ~/.no-mistakes/worktrees/ebf490aaaabf/01M4GWN56J87RH10DYGJWSQVRW   Opus 5.5 (medium) ☕ awake
+  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents

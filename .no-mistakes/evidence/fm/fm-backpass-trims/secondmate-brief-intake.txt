@@ -1,0 +1,11 @@
+$ FM_HOME=<lab> bin/fm-brief.sh sm-demo --secondmate --no-projects
+scaffolded: /tmp/fm-lab-brief/data/sm-demo/brief.md (secondmate charter)
+exit=0
+brief file: data/sm-demo
+/tmp/fm-lab-brief/data/sm-demo/brief.md-15-Delegate project work to your own crewmates with the normal firstmate lifecycle: brief, spawn, status, watcher, steer, teardown, and recovery.
+/tmp/fm-lab-brief/data/sm-demo/brief.md:16:Load `task-intake` from this home's `.agents/skills/` before every routed task intake, brief authoring or revision, delivery resolution, and scout promotion; it loads the quota-array owner before matched-array selection.
+/tmp/fm-lab-brief/data/sm-demo/brief.md-17-Do not invent a second delegation system.
+
+$ FM_HOME=<lab> bin/fm-brief.sh ship-demo demo-repo   # adversarial: ship without --mode
+error: ship briefs require --mode <no-mistakes|direct-PR|local-only>; resolve it at intake from the captain's instruction and the project's registered posture in data/projects.md
+exit=1
