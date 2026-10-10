@@ -9,6 +9,7 @@ if (process.env.FM_TEST_CODEX_CONFIG_STALL) { // a server that never finishes sh
   process.on('SIGTERM', () => {}); setInterval(() => {}, 1000);
 }
 let races = Number(process.env.FM_TEST_CODEX_CONFIG_CONFLICT || 0); // reads that a concurrent edit follows
+let lost = Number(process.env.FM_TEST_CODEX_CONFIG_LOST || 0); // ok writes a concurrent replace drops
 rl.createInterface({input: process.stdin}).on('line', line => {
   const r = JSON.parse(line);
   if (r.id === undefined) return;
@@ -27,7 +28,9 @@ rl.createInterface({input: process.stdin}).on('line', line => {
       const key = JSON.parse(r.params.keyPath.slice(9, -12));
       config.projects ||= {}; config.projects[key] ||= {};
       config.projects[key].trust_level = r.params.value;
-      fs.writeFileSync(file, JSON.stringify(config));
+      if (lost > 0 && lost--) // another writer's replace, based on the old content, lands after ours
+        fs.writeFileSync(file, JSON.stringify({...JSON.parse(content), concurrent_setting: (JSON.parse(content).concurrent_setting || 0) + 1}));
+      else fs.writeFileSync(file, JSON.stringify(config));
       result = {status:'ok', filePath:store};
     }
     console.log(JSON.stringify({id:r.id, result}));

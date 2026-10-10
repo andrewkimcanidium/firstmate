@@ -6,8 +6,8 @@
 # the given secondmate is eligible. No ancestor or primary checkout is trusted.
 # Uses node and the installed codex app-server config/read + config/value/write
 # API, without starting a model turn. Codex owns TOML parsing, preservation,
-# atomic replacement and version-conflict detection; a conflicting concurrent
-# edit is re-read and retried, up to 3 attempts. The exact launch path alone
+# atomic replacement and version-conflict detection; a conflicting or lost
+# concurrent edit is re-read and retried, up to 3 attempts. The exact launch path alone
 # is registered in ${CODEX_HOME:-$HOME/.codex}/config.toml; workspace trust never
 # changes hook trust. Relative CODEX_HOME, malformed config, explicit untrusted
 # entries, symlinked stores and foreign ownership fail closed. Existing trusted
@@ -107,14 +107,17 @@ async function main() {
   await rpc('initialize', {clientInfo: {name: 'firstmate-workspace-trust', version: '1'}, capabilities: null});
   server.stdin.write(JSON.stringify({method: 'initialized'}) + '\n');
   const userLayer = result => result.layers?.find(item => item.name.type === 'user' && !item.name.profile && item.name.file === store);
+  // Each attempt's read verifies the previous write: a version conflict or a
+  // concurrent replace that dropped an acknowledged write is re-read and retried.
   for (let attempt = 1; ; attempt++) {
+    checkStore(store);
     const layer = userLayer(await rpc('config/read', {includeLayers: true}));
     if (!layer || !layer.version || !layer.config || typeof layer.config !== 'object')
       refuse('Codex did not report a versioned user config layer for the launch store');
     const entry = layer.config.projects?.[target];
     if (entry?.trust_level === 'untrusted') refuse(`existing entry for ${target} is explicitly untrusted`);
     if (entry?.trust_level === 'trusted') break;
-    checkStore(store);
+    if (attempt > 3) refuse(`${store} did not retain workspace trust; gave up after 3 attempts`);
     let written;
     try {
       written = await rpc('config/value/write', {
@@ -123,16 +126,10 @@ async function main() {
       });
     } catch (error) {
       if (error.data?.config_write_error_code !== 'configVersionConflict') throw error;
-      if (attempt === 3) refuse(`${store} kept changing during registration; gave up after 3 attempts`);
       continue;
     }
     if (written.status !== 'ok' || written.filePath !== store) refuse('Codex did not confirm the trust write');
-    break;
   }
-  checkStore(store);
-  const persisted = userLayer(await rpc('config/read', {includeLayers: true}));
-  if (persisted?.config?.projects?.[target]?.trust_level !== 'trusted')
-    refuse('Codex configuration did not retain workspace trust');
   console.log(`trusted: ${target}`);
 }
 main().catch(error => {
