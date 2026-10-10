@@ -6,7 +6,8 @@
 # the given secondmate is eligible. No ancestor or primary checkout is trusted.
 # Uses node and the installed codex app-server config/read + config/value/write
 # API, without starting a model turn. Codex owns TOML parsing, preservation,
-# atomic replacement and version-conflict refusal. The exact launch path alone
+# atomic replacement and version-conflict detection; a conflicting concurrent
+# edit is re-read and retried, up to 3 attempts. The exact launch path alone
 # is registered in ${CODEX_HOME:-$HOME/.codex}/config.toml; workspace trust never
 # changes hook trust. Relative CODEX_HOME, malformed config, explicit untrusted
 # entries, symlinked stores and foreign ownership fail closed. Existing trusted
@@ -15,7 +16,7 @@
 # it never uses the shared daemon.
 set -u
 if [ "${1:-}" = --help ] || [ "${1:-}" = -h ]; then
-  sed -n '2,15{s/^# \{0,1\}//;p;}' "$0"
+  sed -n '2,16{s/^# \{0,1\}//;p;}' "$0"
   exit 0
 fi
 command -v node >/dev/null 2>&1 || { echo 'error: Codex trust requires node' >&2; exit 1; }
@@ -99,29 +100,37 @@ async function main() {
     const item = pending.get(response.id);
     if (!item) return;
     pending.delete(response.id);
-    if (response.error) item.reject(new Error(response.error.message || JSON.stringify(response.error)));
+    if (response.error) item.reject(Object.assign(new Error(response.error.message || JSON.stringify(response.error)), {data: response.error.data}));
     else item.resolve(response.result);
   });
   timer = setTimeout(() => failPending(new Error('Codex config server timed out after 15 seconds')), 15000);
   await rpc('initialize', {clientInfo: {name: 'firstmate-workspace-trust', version: '1'}, capabilities: null});
   server.stdin.write(JSON.stringify({method: 'initialized'}) + '\n');
-  const read = await rpc('config/read', {includeLayers: true});
-  const layer = read.layers?.find(item => item.name.type === 'user' && !item.name.profile && item.name.file === store);
-  if (!layer || !layer.version || !layer.config || typeof layer.config !== 'object')
-    refuse('Codex did not report a versioned user config layer for the launch store');
-  const entry = layer.config.projects?.[target];
-  if (entry?.trust_level === 'untrusted') refuse(`existing entry for ${target} is explicitly untrusted`);
-  if (entry?.trust_level !== 'trusted') {
+  const userLayer = result => result.layers?.find(item => item.name.type === 'user' && !item.name.profile && item.name.file === store);
+  for (let attempt = 1; ; attempt++) {
+    const layer = userLayer(await rpc('config/read', {includeLayers: true}));
+    if (!layer || !layer.version || !layer.config || typeof layer.config !== 'object')
+      refuse('Codex did not report a versioned user config layer for the launch store');
+    const entry = layer.config.projects?.[target];
+    if (entry?.trust_level === 'untrusted') refuse(`existing entry for ${target} is explicitly untrusted`);
+    if (entry?.trust_level === 'trusted') break;
     checkStore(store);
-    const written = await rpc('config/value/write', {
-      keyPath: `projects.${JSON.stringify(target)}.trust_level`, value: 'trusted',
-      mergeStrategy: 'replace', filePath: store, expectedVersion: layer.version
-    });
+    let written;
+    try {
+      written = await rpc('config/value/write', {
+        keyPath: `projects.${JSON.stringify(target)}.trust_level`, value: 'trusted',
+        mergeStrategy: 'replace', filePath: store, expectedVersion: layer.version
+      });
+    } catch (error) {
+      if (error.data?.config_write_error_code !== 'configVersionConflict') throw error;
+      if (attempt === 3) refuse(`${store} kept changing during registration; gave up after 3 attempts`);
+      continue;
+    }
     if (written.status !== 'ok' || written.filePath !== store) refuse('Codex did not confirm the trust write');
+    break;
   }
   checkStore(store);
-  const verified = await rpc('config/read', {includeLayers: true});
-  const persisted = verified.layers?.find(item => item.name.type === 'user' && !item.name.profile && item.name.file === store);
+  const persisted = userLayer(await rpc('config/read', {includeLayers: true}));
   if (persisted?.config?.projects?.[target]?.trust_level !== 'trusted')
     refuse('Codex configuration did not retain workspace trust');
   console.log(`trusted: ${target}`);

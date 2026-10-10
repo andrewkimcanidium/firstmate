@@ -8,6 +8,7 @@ if (process.env.FM_TEST_CODEX_CONFIG_STALL) { // a server that never finishes sh
   fs.writeFileSync(process.env.FM_TEST_CODEX_CONFIG_STALL, String(process.pid));
   process.on('SIGTERM', () => {}); setInterval(() => {}, 1000);
 }
+let races = Number(process.env.FM_TEST_CODEX_CONFIG_CONFLICT || 0); // reads that a concurrent edit follows
 rl.createInterface({input: process.stdin}).on('line', line => {
   const r = JSON.parse(line);
   if (r.id === undefined) return;
@@ -17,11 +18,12 @@ rl.createInterface({input: process.stdin}).on('line', line => {
     let result = {};
     if (r.method === 'config/read') {
       result = {layers: [{name: {type:'user', file:store, profile:null}, version:content, config}]};
-      if (process.env.FM_TEST_CODEX_CONFIG_CONFLICT === '1')
-        fs.writeFileSync(file, JSON.stringify({...config, concurrent_setting: true}));
+      if (races > 0 && races--)
+        fs.writeFileSync(file, JSON.stringify({...config, concurrent_setting: (config.concurrent_setting || 0) + 1}));
     }
     if (r.method === 'config/value/write') {
-      if (r.params.expectedVersion !== content) throw Error('version conflict');
+      if (r.params.expectedVersion !== content)
+        throw Object.assign(Error('version conflict'), {data: {config_write_error_code: 'configVersionConflict'}});
       const key = JSON.parse(r.params.keyPath.slice(9, -12));
       config.projects ||= {}; config.projects[key] ||= {};
       config.projects[key].trust_level = r.params.value;
@@ -29,5 +31,5 @@ rl.createInterface({input: process.stdin}).on('line', line => {
       result = {status:'ok', filePath:store};
     }
     console.log(JSON.stringify({id:r.id, result}));
-  } catch(error) { console.log(JSON.stringify({id:r.id, error:{message:error.message}})); }
+  } catch(error) { console.log(JSON.stringify({id:r.id, error:{message:error.message, data:error.data}})); }
 });

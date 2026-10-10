@@ -55,13 +55,22 @@ out=$(CODEX_HOME=relative "$TRUST" "$WT" "$PROJ" 2>&1)
 expect_code 1 $? "relative CODEX_HOME accepted: $out"
 pass 'malformed, declined, symlinked and ambiguous stores fail closed'
 
-# The vendor's optimistic version contract refuses a concurrent edit.
+# The vendor's optimistic version contract detects a concurrent edit; a fresh
+# read retries it, and an edit that keeps racing past the bound is refused.
 printf '%s\n' '{"operator_setting":true}' > "$CONFIG/config.toml"
-out=$(FM_TEST_CODEX_CONFIG_CONFLICT=1 run_trust "$WT" "$PROJ")
-expect_code 1 $? "a concurrent edit was overwritten: $out"
-node -e 'const fs=require("fs");const j=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));if(!j.operator_setting||!j.concurrent_setting||j.projects)process.exit(1)' "$CONFIG/config.toml"
+out=$(FM_TEST_CODEX_CONFIG_CONFLICT=2 run_trust "$WT" "$PROJ")
+expect_code 0 $? "a conflict that cleared on retry was refused: $out"
+node -e 'const fs=require("fs");const j=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));if(!j.operator_setting||j.concurrent_setting!==2)process.exit(1)' "$CONFIG/config.toml"
+expect_code 0 $? 'retried registration lost concurrent changes'
+assert_trusted "$WT" || fail 'retried registration did not record trust'
+pass 'a version conflict that clears is retried and retains concurrent changes'
+
+printf '%s\n' '{"operator_setting":true}' > "$CONFIG/config.toml"
+out=$(FM_TEST_CODEX_CONFIG_CONFLICT=3 run_trust "$WT" "$PROJ")
+expect_code 1 $? "a persistent concurrent edit was overwritten: $out"
+node -e 'const fs=require("fs");const j=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));if(!j.operator_setting||j.concurrent_setting!==3||j.projects)process.exit(1)' "$CONFIG/config.toml"
 expect_code 0 $? 'version conflict lost configuration or recorded trust'
-pass 'version conflict refuses registration and retains concurrent changes'
+pass 'a version conflict past the bound refuses registration and retains concurrent changes'
 
 # A server that ignores SIGTERM after the verdict must not keep the refusal waiting.
 printf 'broken = [\n' > "$CONFIG/config.toml"
