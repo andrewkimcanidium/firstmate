@@ -1,0 +1,37 @@
+### Scenario: real fm-spawn.sh codex scout in lab (exit 0)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+spawned scout-trust1 harness=codex kind=scout window=primary:fm-scout-trust1 worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.9u4kOf/th/.treehouse/proj-679b84/1/proj
+### Lab CODEX_HOME/config.toml after spawn
+model_reasoning_effort = "low"
+
+[projects."/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.9u4kOf/th/.treehouse/proj-679b84/1/proj"]
+trust_level = "trusted"
+
+[tui]
+screen_reader_detection_done = true
+
+[tui.model_availability_nux]
+"gpt-6.1-sol" = 1
+### Scenario: same spawn with malformed config.toml
+SPAWN2_EXIT=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: refusing to pre-register Codex workspace trust: failed to read configuration layers: /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.9u4kOf/codex/config.toml:1:11: unclosed array, expected `]`
+error: could not pre-register Codex workspace trust for /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.9u4kOf/th/.treehouse/proj-679b84/2/proj; refusing to launch a codex worker that would wedge on the trust dialog; inspect window primary:fm-scout-trust2
+### lab tmux windows after refused spawn
+0: bash* (1 panes) [200x50] [layout ac9d,200x50,0,0,0] @0 (active)
+1: fm-scout-trust1 (1 panes) [200x50] [layout ac9e,200x50,0,0,1] @1
+2: fm-scout-trust2 (1 panes) [200x50] [layout ac9f,200x50,0,0,2] @2
+### refused window: foreground command and pane tail (no codex launched)
+zsh
+🌳 Entered worktree at /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.9u4kOf/th/.treehouse/proj-679b84/2/proj. Type 'exit' to return.
+ .treehouse/proj-679b84/2/proj    HEAD
+❯ cd -- '/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.9u4kOf/th/.treehouse/proj-679b84/2/proj'
+ .treehouse/proj-679b84/2/proj    HEAD
+❯

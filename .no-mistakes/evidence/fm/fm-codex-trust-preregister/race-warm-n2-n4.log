@@ -1,0 +1,10 @@
+N=2 run 1: wt1 exit=0 wt2 exit=0 
+N=2 run 2: wt1 exit=0 wt2 exit=0 
+N=2 run 3: wt1 exit=0 wt2 exit=0 
+N=2 run 4: wt1 exit=0 wt2 exit=0 
+N=2 run 5: wt1 exit=0 wt2 exit=1 
+N=4 run 1: wt1 exit=0 wt2 exit=0 wt3 exit=0 wt4 exit=0 
+N=4 run 2: wt1 exit=0 wt2 exit=0 wt3 exit=0 wt4 exit=0 
+N=4 run 3: wt1 exit=0 wt2 exit=0 wt3 exit=1 wt4 exit=0 
+N=4 run 4: wt1 exit=0 wt2 exit=0 wt3 exit=0 wt4 exit=0 
+N=4 run 5: wt1 exit=1 wt2 exit=0 wt3 exit=0 wt4 exit=1 

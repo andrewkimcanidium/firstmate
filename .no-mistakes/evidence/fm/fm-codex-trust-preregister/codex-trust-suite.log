@@ -1,0 +1,11 @@
+ok - fresh worktree trust is idempotent
+ok - existing configuration is preserved
+ok - primary checkout, subdirectories and unrelated paths are refused
+ok - malformed, declined, symlinked and ambiguous stores fail closed
+ok - a version conflict that clears is retried and retains concurrent changes
+ok - a version conflict past the bound refuses registration and retains concurrent changes
+ok - a server stalled on shutdown is killed and the refusal still returns
+ok - only the named seeded secondmate home is eligible
+ok - spawn registers trust and forwards the same CODEX_HOME
+ok - spawn refuses before launching when trust registration fails
+# all fm-codex-trust checks passed

@@ -1,0 +1,7 @@
+n=2 rounds=25 refused=0 missing_entries=0
+n=4 rounds=12 refused=0 missing_entries=0
+project tables: 99
+trusted: 99
+model = "gpt-5"
+
+[projects."/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-race.4ED9Me/warm"]

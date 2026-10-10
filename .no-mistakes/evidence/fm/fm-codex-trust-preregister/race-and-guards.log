@@ -1,0 +1,50 @@
+== scenario: 8 concurrent spawns registering into one shared store ==
+error: refusing to pre-register Codex workspace trust: Codex config server exited (1)
+wt1 exit=1
+trusted: /private$TMPDIR/fm-codex-race.3k90df/treehouse/wt2
+wt2 exit=0
+trusted: /private$TMPDIR/fm-codex-race.3k90df/treehouse/wt3
+wt3 exit=0
+error: refusing to pre-register Codex workspace trust: Codex config server exited (1)
+wt4 exit=1
+trusted: /private$TMPDIR/fm-codex-race.3k90df/treehouse/wt5
+wt5 exit=0
+trusted: /private$TMPDIR/fm-codex-race.3k90df/treehouse/wt6
+wt6 exit=0
+trusted: /private$TMPDIR/fm-codex-race.3k90df/treehouse/wt7
+wt7 exit=0
+trusted: /private$TMPDIR/fm-codex-race.3k90df/treehouse/wt8
+wt8 exit=0
+== persisted trust entries ==
+6
+# operator comment
+model = "gpt-5"
+
+[projects."/private$TMPDIR/fm-codex-race.3k90df/treehouse/wt7"]
+trust_level = "trusted"
+
+[projects."/private$TMPDIR/fm-codex-race.3k90df/treehouse/wt2"]
+trust_level = "trusted"
+
+[projects."/private$TMPDIR/fm-codex-race.3k90df/treehouse/wt5"]
+trust_level = "trusted"
+
+[projects."/private$TMPDIR/fm-codex-race.3k90df/treehouse/wt8"]
+trust_level = "trusted"
+
+[projects."/private$TMPDIR/fm-codex-race.3k90df/treehouse/wt3"]
+trust_level = "trusted"
+
+[projects."/private$TMPDIR/fm-codex-race.3k90df/treehouse/wt6"]
+trust_level = "trusted"
+== scenario: primary checkout refused ==
+error: refusing to pre-register Codex workspace trust: /private$TMPDIR/fm-codex-race.3k90df/proj is a primary checkout, not an isolated worktree
+exit=1
+== scenario: treehouse root (ancestor) refused ==
+error: refusing to pre-register Codex workspace trust: Command failed: git -C /private$TMPDIR/fm-codex-race.3k90df/treehouse rev-parse --show-toplevel
+exit=1
+== scenario: explicit untrusted entry is not overridden ==
+error: refusing to pre-register Codex workspace trust: existing entry for /private$TMPDIR/fm-codex-race.3k90df/treehouse/wtx is explicitly untrusted
+exit=1
+[projects."/private$TMPDIR/fm-codex-race.3k90df/treehouse/wtx"]
+trust_level = "untrusted"

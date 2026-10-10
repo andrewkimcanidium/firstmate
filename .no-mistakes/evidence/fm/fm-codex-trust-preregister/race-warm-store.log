@@ -1,0 +1,52 @@
+##### run 1
+wt1 exit=0
+wt2 exit=0
+wt3 exit=0
+error: refusing to pre-register Codex workspace trust: /private$TMPDIR/fm-codex-race.q0mTMR/codex/config.toml kept changing during registration; gave up after 3 attempts
+wt4 exit=1
+wt5 exit=0
+wt6 exit=0
+wt7 exit=0
+wt8 exit=0
+7
+error: refusing to pre-register Codex workspace trust: /private$TMPDIR/fm-codex-race.q0mTMR/proj is a primary checkout, not an isolated worktree
+exit=1
+error: refusing to pre-register Codex workspace trust: Command failed: git -C /private$TMPDIR/fm-codex-race.q0mTMR/treehouse rev-parse --show-toplevel
+exit=1
+error: refusing to pre-register Codex workspace trust: existing entry for /private$TMPDIR/fm-codex-race.q0mTMR/treehouse/wtx is explicitly untrusted
+exit=1
+##### run 2
+error: refusing to pre-register Codex workspace trust: /private$TMPDIR/fm-codex-race.RYuRQ1/codex/config.toml kept changing during registration; gave up after 3 attempts
+wt1 exit=1
+wt2 exit=0
+wt3 exit=0
+wt4 exit=0
+wt5 exit=0
+wt6 exit=0
+wt7 exit=0
+wt8 exit=0
+7
+error: refusing to pre-register Codex workspace trust: /private$TMPDIR/fm-codex-race.RYuRQ1/proj is a primary checkout, not an isolated worktree
+exit=1
+error: refusing to pre-register Codex workspace trust: Command failed: git -C /private$TMPDIR/fm-codex-race.RYuRQ1/treehouse rev-parse --show-toplevel
+exit=1
+error: refusing to pre-register Codex workspace trust: existing entry for /private$TMPDIR/fm-codex-race.RYuRQ1/treehouse/wtx is explicitly untrusted
+exit=1
+##### run 3
+wt1 exit=0
+wt2 exit=0
+wt3 exit=0
+wt4 exit=0
+error: refusing to pre-register Codex workspace trust: /private$TMPDIR/fm-codex-race.KZt0RE/codex/config.toml kept changing during registration; gave up after 3 attempts
+wt5 exit=1
+error: refusing to pre-register Codex workspace trust: /private$TMPDIR/fm-codex-race.KZt0RE/codex/config.toml kept changing during registration; gave up after 3 attempts
+wt6 exit=1
+wt7 exit=0
+wt8 exit=0
+6
+error: refusing to pre-register Codex workspace trust: /private$TMPDIR/fm-codex-race.KZt0RE/proj is a primary checkout, not an isolated worktree
+exit=1
+error: refusing to pre-register Codex workspace trust: Command failed: git -C /private$TMPDIR/fm-codex-race.KZt0RE/treehouse rev-parse --show-toplevel
+exit=1
+error: refusing to pre-register Codex workspace trust: existing entry for /private$TMPDIR/fm-codex-race.KZt0RE/treehouse/wtx is explicitly untrusted
+exit=1

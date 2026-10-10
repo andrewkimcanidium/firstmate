@@ -1,4 +1,4 @@
 ok - codex codex-cli 0.159.3: unregistered checkout gates; registered worktree reaches composer without input
 ok - codex codex-cli 0.159.3: native config API preserves TOML, is idempotent and refuses malformed input
 # all fm-codex-workspace-trust-live-e2e checks passed
-bash tests/fm-codex-workspace-trust-live-e2e.test.sh  1.02s user 1.64s system 15% cpu 17.527 total
+exit 0
