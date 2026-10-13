@@ -1,0 +1,11 @@
+$ fm-host-headroom.sh check --kind ship --harness claude  (real macOS measurement, defaults)
+ok: available 71% (34897 of 49152 MB), swap used 9528 MB, load 4.15 on 18 cores (0.23 per core), pressure normal; expected worker 1536 MB (default_worker_mb, fewer than 3 measured workers of kind ship); 0 running worker(s) reserve 0 MB
+exit=0
+
+$ config/host-headroom: min_avail_pct=95
+defer: available memory 34897 MB less 0 MB reserved for running workers and this worker's expected 1536 MB leaves 33361 MB, below min_avail_pct=95 (46694 MB) - available 71% (34897 of 49152 MB), swap used 9528 MB, load 4.15 on 18 cores (0.23 per core), pressure normal; expected worker 1536 MB (default_worker_mb, fewer than 3 measured workers of kind ship); 0 running worker(s) reserve 0 MB
+exit=75
+
+$ config/host-headroom: min_avail_pct=lots
+error: host headroom thresholds are unreadable: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf/config/host-headroom line 1: min_avail_pct must be a whole percent from 0 to 100 or off
+exit=1

@@ -1,0 +1,19 @@
+ok - a machine within every default threshold is ok and names its numbers and the expected footprint
+ok - each default threshold admits its exact edge and defers just past it, naming every breach
+ok - config/host-headroom overrides each default and off disables a threshold
+ok - a new worker's expected footprint comes from its kind and harness, then its kind, then every worker
+ok - workers from any project share one machine budget and are admitted by their expected size
+ok - startup and teardown readings alone never lower the expected footprint below default_worker_mb
+ok - a home that cannot be read never hides the workers of the homes that can
+ok - a local secondmate home shares the root home's thresholds and footprint log
+ok - a malformed, duplicated, or unreadable threshold file refuses rather than guessing
+ok - darwin headroom is read from sysctl, with vm_stat as the available-memory fallback
+ok - linux headroom is read from /proc/meminfo and /proc/loadavg
+ok - a missing tool or unfamiliar platform is reported unmeasured and never blocks a spawn
+ok - record tags the worker's project, kind, harness, and model and sums the memory of its worktree's processes
+ok - report gives per-worker memory by kind, harness, and project, the machine budget, and which project pools bind first
+ok - a fresh spawn on a machine short of headroom is deferred with exit 75 before anything is created
+ok - a fresh spawn with headroom launches and records the machine's headroom
+ok - FM_SPAWN_IGNORE_HEADROOM=1 launches one spawn without the check
+ok - a rapid sequential fan-out is stopped at the machine budget by the running workers' reservation
+ok - a spawn refuses rather than guessing when the threshold file is unreadable

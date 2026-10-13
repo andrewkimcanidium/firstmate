@@ -1,0 +1,91 @@
+# Live fan-out on this Mac: real tmux (private fm-lab socket), real treehouse, real Claude Haiku workers, real macOS memory measurement
+# config/host-headroom during fan-out: default_worker_mb=4800 (other thresholds default; min_avail_pct=20)
+
+$ fm-spawn.sh hr-a ...
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf
+warning: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf/data/hr-a/launch-brief.md records no ship branch; defaulting to legacy branch fm/hr-a
+spawned hr-a harness=claude kind=ship mode=no-mistakes yolo=off window=primary:fm-hr-a worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.hMcowf/projects/demo/.treehouse/demo-723a26/1/demo
+exit=0
+
+$ fm-spawn.sh hr-b ...
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf
+warning: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf/data/hr-b/launch-brief.md records no ship branch; defaulting to legacy branch fm/hr-b
+spawned hr-b harness=claude kind=ship mode=no-mistakes yolo=off window=primary:fm-hr-b worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.hMcowf/projects/demo/.treehouse/demo-723a26/2/demo
+exit=0
+
+$ fm-spawn.sh hr-c ...
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf
+warning: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf/data/hr-c/launch-brief.md records no ship branch; defaulting to legacy branch fm/hr-c
+spawned hr-c harness=claude kind=ship mode=no-mistakes yolo=off window=primary:fm-hr-c worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.hMcowf/projects/demo/.treehouse/demo-723a26/3/demo
+exit=0
+
+$ fm-spawn.sh hr-d ...  (fan-out past budget)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf
+deferred: this machine is short of headroom for another worker (available memory 26050 MB less 13306 MB reserved for running workers and this worker's expected 4800 MB leaves 7944 MB, below min_avail_pct=20 (9830 MB) - available 53% (26050 of 49152 MB), swap used 7997 MB, load 4.62 on 18 cores (0.26 per core), pressure normal; expected worker 4800 MB (default_worker_mb, fewer than 3 measured workers of kind ship); 3 running worker(s) reserve 13306 MB); task hr-d was not launched and its backlog item stays queued - dispatch it again once running work frees memory or load, or set FM_SPAWN_IGNORE_HEADROOM=1 for this one spawn (docs/configuration.md "Host headroom")
+exit=75
+
+# headroom lock held by another process for 12s, then fm-spawn.sh hr-e:
+holder: acquired 13:57:13
+holder: released 13:57:25
+spawn hr-e started 13:57:13, finished 13:57:26
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf
+deferred: this machine is short of headroom for another worker (available memory 25067 MB less 13299 MB reserved for running workers and this worker's expected 4800 MB leaves 6968 MB, below min_avail_pct=20 (9830 MB) - available 51% (25067 of 49152 MB), swap used 7997 MB, load 3.89 on 18 cores (0.22 per core), pressure normal; expected worker 4800 MB (default_worker_mb, fewer than 3 measured workers of kind ship); 3 running worker(s) reserve 13299 MB); task hr-e was not launched and its backlog item stays queued - dispatch it again once running work frees memory or load, or set FM_SPAWN_IGNORE_HEADROOM=1 for this one spawn (docs/configuration.md "Host headroom")
+exit=75
+
+$ FM_SPAWN_IGNORE_HEADROOM=1 fm-spawn.sh hr-d ...
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf
+notice: FM_SPAWN_IGNORE_HEADROOM=1 - launching hr-d without checking this machine's headroom
+warning: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf/data/hr-d/launch-brief.md records no ship branch; defaulting to legacy branch fm/hr-d
+spawned hr-d harness=claude kind=ship mode=no-mistakes yolo=off window=primary:fm-hr-d worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.hMcowf/projects/demo/.treehouse/demo-723a26/4/demo
+exit=0
+
+$ fm-teardown.sh hr-d --force
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf
+teardown: reaping leaked worktree process(es) for hr-d: 33927 40128 40895 67227
+teardown: force-killing leaked worktree process(es) for hr-d: 33927
+🌳 Worktree returned to pool.
+/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.hMcowf/projects/demo: already current
+teardown hr-d complete (window primary:fm-hr-d, worktree /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.hMcowf/projects/demo/.treehouse/demo-723a26/4/demo)
+Backlog: hr-d just finished (this home keeps no markdown backlog at /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.hMcowf/data/backlog.md). Update /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.hMcowf/data/backlog.md - move hr-d to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+exit=0
+
+# state/host-footprint.log (root home)
+1791917768 event=spawn task=hr-a project=demo kind=ship harness=claude model=haiku worker_rss_mb=- avail_pct=52 avail_mb=25559 total_mb=49152 swap_used_mb=7997 load1=4.23 cores=18 pressure=normal
+1791917777 event=sample task=hr-a project=demo kind=ship harness=claude model=haiku worker_rss_mb=360 avail_pct=52 avail_mb=25559 total_mb=49152 swap_used_mb=7997 load1=4.05 cores=18 pressure=normal
+1791917792 event=sample task=hr-a project=demo kind=ship harness=claude model=haiku worker_rss_mb=361 avail_pct=53 avail_mb=26050 total_mb=49152 swap_used_mb=7997 load1=3.70 cores=18 pressure=normal
+1791917799 event=sample task=hr-a project=demo kind=ship harness=claude model=haiku worker_rss_mb=363 avail_pct=53 avail_mb=26050 total_mb=49152 swap_used_mb=7997 load1=3.89 cores=18 pressure=normal
+1791917804 event=spawn task=hr-b project=demo kind=ship harness=claude model=haiku worker_rss_mb=- avail_pct=53 avail_mb=26050 total_mb=49152 swap_used_mb=7997 load1=4.30 cores=18 pressure=normal
+1791917807 event=sample task=hr-a project=demo kind=ship harness=claude model=haiku worker_rss_mb=361 avail_pct=53 avail_mb=26050 total_mb=49152 swap_used_mb=7997 load1=4.19 cores=18 pressure=normal
+1791917807 event=sample task=hr-b project=demo kind=ship harness=claude model=haiku worker_rss_mb=352 avail_pct=53 avail_mb=26050 total_mb=49152 swap_used_mb=7997 load1=4.19 cores=18 pressure=normal
+1791917812 event=spawn task=hr-c project=demo kind=ship harness=claude model=haiku worker_rss_mb=- avail_pct=53 avail_mb=26050 total_mb=49152 swap_used_mb=7997 load1=4.42 cores=18 pressure=normal
+1791917818 event=sample task=hr-a project=demo kind=ship harness=claude model=haiku worker_rss_mb=361 avail_pct=53 avail_mb=26050 total_mb=49152 swap_used_mb=7997 load1=4.62 cores=18 pressure=normal
+1791917818 event=sample task=hr-b project=demo kind=ship harness=claude model=haiku worker_rss_mb=370 avail_pct=53 avail_mb=26050 total_mb=49152 swap_used_mb=7997 load1=4.62 cores=18 pressure=normal
+1791917818 event=sample task=hr-c project=demo kind=ship harness=claude model=haiku worker_rss_mb=363 avail_pct=53 avail_mb=26050 total_mb=49152 swap_used_mb=7997 load1=4.62 cores=18 pressure=normal
+1791917845 event=sample task=hr-a project=demo kind=ship harness=claude model=haiku worker_rss_mb=362 avail_pct=51 avail_mb=25067 total_mb=49152 swap_used_mb=7997 load1=3.89 cores=18 pressure=normal
+1791917845 event=sample task=hr-b project=demo kind=ship harness=claude model=haiku worker_rss_mb=369 avail_pct=51 avail_mb=25067 total_mb=49152 swap_used_mb=7997 load1=3.89 cores=18 pressure=normal
+1791917845 event=sample task=hr-c project=demo kind=ship harness=claude model=haiku worker_rss_mb=370 avail_pct=51 avail_mb=25067 total_mb=49152 swap_used_mb=7997 load1=3.89 cores=18 pressure=normal
+1791917857 event=spawn task=hr-d project=demo kind=ship harness=claude model=haiku worker_rss_mb=- avail_pct=51 avail_mb=25067 total_mb=49152 swap_used_mb=7997 load1=4.61 cores=18 pressure=normal
+1791917862 event=sample task=hr-a project=demo kind=ship harness=claude model=haiku worker_rss_mb=363 avail_pct=51 avail_mb=25067 total_mb=49152 swap_used_mb=7997 load1=4.32 cores=18 pressure=normal
+1791917862 event=sample task=hr-b project=demo kind=ship harness=claude model=haiku worker_rss_mb=370 avail_pct=51 avail_mb=25067 total_mb=49152 swap_used_mb=7997 load1=4.32 cores=18 pressure=normal
+1791917862 event=sample task=hr-c project=demo kind=ship harness=claude model=haiku worker_rss_mb=368 avail_pct=51 avail_mb=25067 total_mb=49152 swap_used_mb=7997 load1=4.32 cores=18 pressure=normal
+1791917862 event=sample task=hr-d project=demo kind=ship harness=claude model=haiku worker_rss_mb=365 avail_pct=51 avail_mb=25067 total_mb=49152 swap_used_mb=7997 load1=4.32 cores=18 pressure=normal
+1791917879 event=teardown task=hr-d project=demo kind=ship harness=claude model=haiku worker_rss_mb=367 avail_pct=49 avail_mb=24084 total_mb=49152 swap_used_mb=7989 load1=4.58 cores=18 pressure=normal
+
+# worker hr-a pane
+  Read 1 file
+⏺ idle
+✻ Baked for 8s · done 1:56 PM
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.hMcowf/projects/demo/.treehouse/demo-723a26/1/demo   Haiku 4.5
+   ctx █░░░░░░░░░ 15%  $0.04
+   ◆ andrewkim@canidium.com    team   5h  3%→18:49  7d 69%→Wed 10/14 15:59
+   ◆ kim.andrew.h.w@gmail.com  max    5h  9%→17:19  7d 58%→Thu 10/15 21:59
+   �� codex                     pro                  7d 19%→Mon 10/19 23:58
+  ⏵⏵ bypass permissions on (shift+tab to cycle) · ← for agents
+# after teardown of all workers
+1791917879 event=teardown task=hr-d project=demo kind=ship harness=claude model=haiku worker_rss_mb=367 avail_pct=49 avail_mb=24084 total_mb=49152 swap_used_mb=7989 load1=4.58 cores=18 pressure=normal
+1791917897 event=teardown task=hr-a project=demo kind=ship harness=claude model=haiku worker_rss_mb=297 avail_pct=49 avail_mb=24084 total_mb=49152 swap_used_mb=7989 load1=5.04 cores=18 pressure=normal
+1791917905 event=teardown task=hr-b project=demo kind=ship harness=claude model=haiku worker_rss_mb=293 avail_pct=49 avail_mb=24084 total_mb=49152 swap_used_mb=7989 load1=4.95 cores=18 pressure=normal
+1791917914 event=teardown task=hr-c project=demo kind=ship harness=claude model=haiku worker_rss_mb=313 avail_pct=50 avail_mb=24576 total_mb=49152 swap_used_mb=7989 load1=6.16 cores=18 pressure=normal

@@ -1,0 +1,9 @@
+Host headroom now: available 51% (25067 of 49152 MB), swap used 7997 MB, load 4.32 on 18 cores (0.24 per core), pressure normal
+Verdict for one more worker: defer - available memory 25067 MB less 17734 MB reserved for running workers and this worker's expected 4800 MB leaves 2533 MB, below min_avail_pct=20 (9830 MB)
+Thresholds (/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf/config/host-headroom): min_avail_pct=20 max_swap_used_mb=16384 max_load_per_core=1.5 defer_pressure=critical default_worker_mb=4800
+Machine budget: 0 MB available above the 20% floor (9830 MB) after 17734 MB reserved for 4 running worker(s) to reach their expected footprint, shared by every project
+Workers running now with measured memory: 4 using 1466 MB
+Per-worker memory: no worker samples yet in /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf/state/host-footprint.log; new workers are expected at default_worker_mb=4800 MB
+Largest safe concurrent worker count implied: 4 (4 running + 0 more at 4800 MB each, default_worker_mb, fewer than 3 measured workers)
+Project worktree pools (/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf/projects):
+  demo: pool cap 16; the machine budget (4 workers) binds first

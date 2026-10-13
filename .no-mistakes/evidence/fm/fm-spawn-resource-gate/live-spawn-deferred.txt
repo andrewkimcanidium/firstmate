@@ -1,0 +1,11 @@
+$ (config/host-headroom: min_avail_pct=95) fm-spawn.sh hr-a <lab>/projects/demo --mode no-mistakes --yolo off --model haiku   [real tmux + treehouse, real macOS measurement]
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf
+deferred: this machine is short of headroom for another worker (available memory 25067 MB less 0 MB reserved for running workers and this worker's expected 1536 MB leaves 23531 MB, below min_avail_pct=95 (46694 MB) - available 51% (25067 of 49152 MB), swap used 7997 MB, load 4.20 on 18 cores (0.23 per core), pressure warn; expected worker 1536 MB (default_worker_mb, fewer than 3 measured workers of kind ship); 0 running worker(s) reserve 0 MB); task hr-a was not launched and its backlog item stays queued - dispatch it again once running work frees memory or load, or set FM_SPAWN_IGNORE_HEADROOM=1 for this one spawn (docs/configuration.md "Host headroom")
+exit=75
+
+--- after deferral: state/ ---
+.last-watcher-beat
+--- lab tmux windows ---
+primary:0: bash* (1 panes) [200x50] 
+--- treehouse pool ---
+"/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf/projects/demo/.treehouse": No such file or directory (os error 2)
