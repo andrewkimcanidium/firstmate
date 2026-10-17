@@ -1657,8 +1657,8 @@ work_is_landed() {
   content_in_default
 }
 
-# The declaration schema belongs to docs/configuration.md (carried contribution
-# stack) and bin/fm-fork-stack.sh. Only this repository's local default can
+# The declaration schema belongs to docs/configuration.md#carried-contribution-stack-configfork-stack.
+# Only this repository's local default can
 # prove a carried replay landed; remote content, another project's same-named
 # branch, or patch ids cannot.
 CARRIED_STACK_BRANCH_KEEP=
