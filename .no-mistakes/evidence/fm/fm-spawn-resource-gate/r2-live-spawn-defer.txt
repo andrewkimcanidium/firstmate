@@ -1,0 +1,15 @@
+# real bin/fm-spawn.sh, real machine memory (no injected sample), marked lab home with config/host-headroom min_avail_pct=95, lab tmux socket
+$ fm-spawn.sh live-1 <lab project> --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/tmp/fm-lab.Eqvoee
+deferred: this machine is short of headroom for another worker (available memory 39813 MB less 0 MB reserved for running workers and this worker's expected 1536 MB leaves 38277 MB, below min_avail_pct=95 (46694 MB) - available 81% (39813 of 49152 MB), swap used 1733 MB, load 3.86 on 18 cores (0.21 per core), pressure normal; expected worker 1536 MB (default_worker_mb, fewer than 3 measured workers of kind ship); 0 running worker(s) reserve 0 MB); task live-1 was not launched and its backlog item stays queued - dispatch it again once running work frees memory or load, or set FM_SPAWN_IGNORE_HEADROOM=1 for this one spawn (docs/configuration.md "Host headroom")
+[exit 75]
+
+# state after deferral (no task record, no footprint log):
+lab tmux windows:
+primary:sleep
+
+# malformed thresholds
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/tmp/fm-lab.Eqvoee
+error: host headroom thresholds are unreadable: /private/tmp/fm-lab.Eqvoee/config/host-headroom line 1: default_worker_mb cannot be off
+error: spawn refused: this machine's headroom could not be judged; fix config/host-headroom so its limits are known (docs/configuration.md "Host headroom")
+[exit 1]

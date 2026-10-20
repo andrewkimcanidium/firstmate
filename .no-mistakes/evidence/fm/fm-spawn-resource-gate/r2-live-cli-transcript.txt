@@ -1,0 +1,41 @@
+$ fm-host-headroom.sh check --kind ship --harness claude   # real machine, default thresholds
+ok: available 81% (39813 of 49152 MB), swap used 1733 MB, load 2.79 on 18 cores (0.15 per core), pressure normal; expected worker 1536 MB (default_worker_mb, fewer than 3 measured workers of kind ship); 0 running worker(s) reserve 0 MB
+[exit 0]
+
+$ fm-host-headroom.sh check --kind ship --harness claude --model opus   # removed flag
+Usage:
+  fm-host-headroom.sh check [--kind <kind>] [--harness <name>]
+  fm-host-headroom.sh record <event> <task-id> [<worktree>]
+  fm-host-headroom.sh sample
+  fm-host-headroom.sh report
+
+[exit 2]
+
+$ fm-host-headroom.sh check --project x   # removed flag
+Usage:
+  fm-host-headroom.sh check [--kind <kind>] [--harness <name>]
+  fm-host-headroom.sh record <event> <task-id> [<worktree>]
+  fm-host-headroom.sh sample
+  fm-host-headroom.sh report
+
+[exit 2]
+
+# tighten: min_avail_pct=95 (adversarial: machine short of headroom)
+$ fm-host-headroom.sh check --kind scout --harness codex
+defer: available memory 39813 MB less 0 MB reserved for running workers and this worker's expected 1536 MB leaves 38277 MB, below min_avail_pct=95 (46694 MB) - available 81% (39813 of 49152 MB), swap used 1733 MB, load 2.79 on 18 cores (0.15 per core), pressure normal; expected worker 1536 MB (default_worker_mb, fewer than 3 measured workers of kind scout); 0 running worker(s) reserve 0 MB
+[exit 75]
+
+# malformed threshold file
+error: host headroom thresholds are unreadable: /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.wDrgXs/config/host-headroom line 1: min_avail_pct must be a whole percent from 0 to 100 or off
+[exit 1]
+
+$ fm-host-headroom.sh report
+Host headroom now: available 81% (39813 of 49152 MB), swap used 1733 MB, load 2.79 on 18 cores (0.15 per core), pressure normal
+Verdict for one more worker: ok
+Thresholds (/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.wDrgXs/config/host-headroom): min_avail_pct=20 max_swap_used_mb=16384 max_load_per_core=1.5 defer_pressure=critical default_worker_mb=1536
+Machine budget: 29983 MB available above the 20% floor (9830 MB) after 0 MB reserved for 0 running worker(s) to reach their expected footprint, shared by every project
+Workers running now with measured memory: 0 using 0 MB
+Per-worker memory: no worker samples yet in /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.wDrgXs/state/host-footprint.log; new workers are expected at default_worker_mb=1536 MB
+Largest safe concurrent worker count implied: 19 (0 running + 19 more at 1536 MB each, default_worker_mb, fewer than 3 measured workers)
+Project worktree pools (/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.wDrgXs/projects):
+[exit 0]
