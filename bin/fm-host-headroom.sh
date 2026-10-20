@@ -7,7 +7,7 @@
 # Every home and worker on a machine shares its memory, so a fan-out that
 # exhausts it takes all of them down at once, whichever projects the workers
 # belong to. bin/fm-spawn.sh runs `check` before a fresh ship or scout launch
-# with the new worker's kind, harness, model, and project, and defers the launch
+# with the new worker's kind and harness, and defers the launch
 # when the machine's headroom, less the memory every running worker still needs
 # to reach its expected footprint and less the memory the new worker is
 # expected to use, would fall below the thresholds. A worker launched seconds
