@@ -469,7 +469,19 @@ printf '%s\n' "$*" >> "$FM_FAKE_CALL_LOG"
 case "$*" in
   *"#{pane_current_path}"*) printf '%s\n' "${FM_FAKE_PANE_PATH:-}"; exit 0 ;;
 esac
-case "${1:-}" in display-message) printf 'firstmate\n' ;; esac
+windows="$FM_FAKE_CALL_LOG.windows"
+case "${1:-}" in
+  display-message) printf 'firstmate\n' ;;
+  list-windows) [ ! -s "$windows" ] || cat "$windows" ;;
+  new-window)
+    name= previous=
+    for arg in "$@"; do
+      [ "$previous" = -n ] && name=$arg
+      previous=$arg
+    done
+    printf '%s\n' "$name" >> "$windows"
+    ;;
+esac
 exit 0
 SH
   cat > "$fakebin/treehouse" <<'SH'
