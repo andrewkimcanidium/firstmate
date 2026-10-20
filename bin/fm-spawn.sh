@@ -3593,8 +3593,8 @@ if [ "$RELAUNCH" -eq 0 ] && [ "$KIND" != secondmate ]; then
     SPAWN_HEADROOM_LOCK_HELD=1
     SPAWN_HEADROOM_RC=0
     SPAWN_HEADROOM=$(FM_HOME=$FM_HOME FM_CONFIG_OVERRIDE=$CONFIG FM_STATE_OVERRIDE=$STATE \
-      "$SCRIPT_DIR/fm-host-headroom.sh" check --kind "$KIND" --harness "$HARNESS" \
-      --model "$MODEL" --project "$(basename "$PROJ_ABS")") || SPAWN_HEADROOM_RC=$?
+      "$SCRIPT_DIR/fm-host-headroom.sh" check --kind "$KIND" --harness "$HARNESS") \
+      || SPAWN_HEADROOM_RC=$?
     if [ "$SPAWN_HEADROOM_RC" -eq "$FM_PROJECT_CAPACITY_DEFER_EXIT" ]; then
       echo "deferred: this machine is short of headroom for another worker (${SPAWN_HEADROOM#defer: }); task $ID was not launched and its backlog item stays queued - dispatch it again once running work frees memory or load, or set FM_SPAWN_IGNORE_HEADROOM=1 for this one spawn (docs/configuration.md \"Host headroom\")" >&2
       exit "$FM_PROJECT_CAPACITY_DEFER_EXIT"

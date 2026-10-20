@@ -24,18 +24,16 @@
 # "Host headroom" is the operator reference.
 #
 # Usage:
-#   fm-host-headroom.sh check [--kind <kind>] [--harness <name>] [--model <name>] [--project <name>]
+#   fm-host-headroom.sh check [--kind <kind>] [--harness <name>]
 #   fm-host-headroom.sh record <event> <task-id> [<worktree>]
 #   fm-host-headroom.sh sample
 #   fm-host-headroom.sh report
 #
 # check prints one line, `ok: ...` or `defer: ...`, naming every measured value,
 # the expected footprint and where it came from, and every threshold breached.
-# --model and --project are accepted for the caller's symmetry and do not
-# change the verdict. Exit 0 when the worker fits, 75 (the sysexits
-# temporary-failure code bin/fm-project-capacity-lib.sh also uses for a
-# deferral) when it does not, 1 when the threshold file is unreadable, and 2 for
-# bad usage.
+# Exit 0 when the worker fits, 75 (the sysexits temporary-failure code
+# bin/fm-project-capacity-lib.sh also uses for a deferral) when it does not,
+# 1 when the threshold file is unreadable, and 2 for bad usage.
 #
 # Measurements. A value that cannot be measured is printed as `?` and judged by
 # no threshold, so a missing tool or an unfamiliar platform never blocks a spawn;
@@ -471,7 +469,6 @@ cmd_check() {
     case "$1" in
       --kind) [ "$#" -ge 2 ] || usage; kind=$2; shift 2 ;;
       --harness) [ "$#" -ge 2 ] || usage; harness=$2; shift 2 ;;
-      --model | --project) [ "$#" -ge 2 ] || usage; shift 2 ;;
       *) usage ;;
     esac
   done

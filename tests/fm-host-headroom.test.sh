@@ -140,7 +140,7 @@ test_expected_footprint_falls_back_by_group() {
       '1000 event=sample task=c1 project=alpha kind=scout harness=codex model=- worker_rss_mb=3000' \
       '1 event=spawn task=n1 project=alpha kind=ship harness=claude model=- worker_rss_mb=-'
   } > "$home/state/host-footprint.log"
-  out=$(headroom "$home" "$HEALTHY" check --kind ship --harness claude --model opus --project delta)
+  out=$(headroom "$home" "$HEALTHY" check --kind ship --harness claude)
   assert_contains "$out" "expected worker 700 MB (90th percentile of 3 ship claude workers)" \
     "a kind and harness with 3 measured tasks did not set the expected footprint"
   out=$(headroom "$home" "$HEALTHY" check --kind ship --harness codex)
@@ -168,11 +168,11 @@ test_mixed_workers_share_one_budget() {
   } > "$home/state/host-footprint.log"
   rc=0
   out=$(headroom "$home" 'total_mb=10000 avail_mb=4000 swap_used_mb=0 load1=1 cores=18 pressure=normal' \
-    check --kind ship --harness claude --project beta) || rc=$?
+    check --kind ship --harness claude) || rc=$?
   expect_code 0 "$rc" "a small expected worker did not fit the shared budget: $out"
   rc=0
   out=$(headroom "$home" 'total_mb=10000 avail_mb=4000 swap_used_mb=0 load1=1 cores=18 pressure=normal' \
-    check --kind scout --harness codex --project beta) || rc=$?
+    check --kind scout --harness codex) || rc=$?
   expect_code "$DEFER_EXIT" "$rc" "a large expected worker was admitted beyond the shared budget: $out"
   assert_contains "$out" "less 0 MB reserved for running workers and this worker's expected 4000 MB leaves 0 MB, below min_avail_pct=20 (2000 MB)" \
     "the deferral did not name the large worker's expected footprint"
