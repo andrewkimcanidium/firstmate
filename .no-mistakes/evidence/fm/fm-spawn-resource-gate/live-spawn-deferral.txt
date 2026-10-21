@@ -1,0 +1,11 @@
+$ FM_HOME=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.6CQWXS fm-spawn.sh task-live <demo> --mode no-mistakes --yolo off   (config/host-headroom: min_avail_pct=95; real sysctl measurements; lab tmux socket /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.6CQWXS/tmux/tmux-501/fm-lab)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.6CQWXS
+deferred: this machine is short of headroom for another worker (available memory 39321 MB less 0 MB reserved for running workers and this worker's expected 1536 MB leaves 37785 MB, below min_avail_pct=95 (46694 MB) - available 80% (39321 of 49152 MB), swap used 1733 MB, load 2.35 on 18 cores (0.13 per core), pressure normal; expected worker 1536 MB (default_worker_mb, fewer than 3 measured workers of kind ship); 0 running worker(s) reserve 0 MB); task task-live was not launched and its backlog item stays queued - dispatch it again once running work frees memory or load, or set FM_SPAWN_IGNORE_HEADROOM=1 for this one spawn (docs/configuration.md "Host headroom")
+[exit 75]
+
+state/task-live.meta present? no
+data/task-live/launch-brief.md present? no
+lab tmux windows: firstmate:zsh 
+treehouse tripwire log: (never called)
+footprint log: (none)
+lock file: "/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.6CQWXS/state/.host-headroom.lock": No such file or directory (os error 2)
