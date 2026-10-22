@@ -17,4 +17,3 @@ ok - a fresh spawn with headroom launches and records the machine's headroom
 ok - FM_SPAWN_IGNORE_HEADROOM=1 launches one spawn without the check
 ok - a rapid sequential fan-out is stopped at the machine budget by the running workers' reservation
 ok - a spawn refuses rather than guessing when the threshold file is unreadable
-bash tests/fm-host-headroom.test.sh  7.26s user 11.13s system 45% cpu 40.022 total

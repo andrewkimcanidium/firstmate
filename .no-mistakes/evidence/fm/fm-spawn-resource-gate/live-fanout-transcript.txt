@@ -1,0 +1,21 @@
+bash-5.3$ clear; bin/fm-spawn.sh fan-1 $FM_HOME/projects/demo --scout --harness claude; echo SPAWN1_EXIT=$?
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.BQ5kuP
+spawned fan-1 harness=claude kind=scout window=primary:fm-fan-1 worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.BQ5kuP/treehouse/.treehouse/demo-4f4b60/1/demo
+SPAWN1_EXIT=0
+bash-5.3$ bin/fm-spawn.sh fan-2 $FM_HOME/projects/demo --scout --harness claude; echo SPAWN2_EXIT=$?
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.BQ5kuP
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+spawned fan-2 harness=claude kind=scout window=primary:fm-fan-2 worktree=/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.BQ5kuP/treehouse/.treehouse/demo-4f4b60/2/demo
+SPAWN2_EXIT=0
+bash-5.3$ bin/fm-spawn.sh fan-3 $FM_HOME/projects/demo --scout --harness claude; echo SPAWN3_EXIT=$?
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.BQ5kuP
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+deferred: this machine is short of headroom for another worker (available memory 37847 MB less 21583 MB reserved for running workers and this worker's expected 11206 MB leaves 5058 MB, below min_avail_pct=20 (9830 MB) - available 77% (37847 of 49152 MB), swap used 5047 MB, load 2.56 on 18 cores (0.14 per core), pressure normal; expected worker 11206 MB (default_worker_mb, fewer than 3 measured workers of kind scout); 2 running worker(s) reserve 21583 MB); task fan-3 was not launched and its backlog item stays queued - dispatch it again once running work frees memory or load, or set FM_SPAWN_IGNORE_HEADROOM=1 for this one spawn (docs/configuration.md "Host headroom")
+SPAWN3_EXIT=75
+bash-5.3$ 

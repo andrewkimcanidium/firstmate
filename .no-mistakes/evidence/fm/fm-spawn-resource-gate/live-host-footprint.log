@@ -1,0 +1,9 @@
+1792666301 event=spawn task=fan-1 project=demo kind=scout harness=claude model=default worker_rss_mb=- avail_pct=77 avail_mb=37847 total_mb=49152 swap_used_mb=5047 load1=3.02 cores=18 pressure=normal
+1792666324 event=sample task=fan-1 project=demo kind=scout harness=claude model=default worker_rss_mb=439 avail_pct=77 avail_mb=37847 total_mb=49152 swap_used_mb=5047 load1=2.66 cores=18 pressure=normal
+1792666329 event=spawn task=fan-2 project=demo kind=scout harness=claude model=default worker_rss_mb=- avail_pct=77 avail_mb=37847 total_mb=49152 swap_used_mb=5047 load1=2.60 cores=18 pressure=normal
+1792666332 event=sample task=fan-1 project=demo kind=scout harness=claude model=default worker_rss_mb=441 avail_pct=77 avail_mb=37847 total_mb=49152 swap_used_mb=5047 load1=2.56 cores=18 pressure=normal
+1792666332 event=sample task=fan-2 project=demo kind=scout harness=claude model=default worker_rss_mb=388 avail_pct=77 avail_mb=37847 total_mb=49152 swap_used_mb=5047 load1=2.56 cores=18 pressure=normal
+1792666352 event=sample task=fan-1 project=demo kind=scout harness=claude model=default worker_rss_mb=441 avail_pct=77 avail_mb=37847 total_mb=49152 swap_used_mb=5047 load1=2.93 cores=18 pressure=normal
+1792666352 event=sample task=fan-2 project=demo kind=scout harness=claude model=default worker_rss_mb=443 avail_pct=77 avail_mb=37847 total_mb=49152 swap_used_mb=5047 load1=2.93 cores=18 pressure=normal
+1792666361 event=teardown task=fan-1 project=demo kind=scout harness=claude model=default worker_rss_mb=439 avail_pct=77 avail_mb=37847 total_mb=49152 swap_used_mb=5047 load1=2.86 cores=18 pressure=normal
+1792666371 event=spawn task=fan-3 project=demo kind=scout harness=claude model=default worker_rss_mb=- avail_pct=77 avail_mb=37847 total_mb=49152 swap_used_mb=5047 load1=2.96 cores=18 pressure=normal

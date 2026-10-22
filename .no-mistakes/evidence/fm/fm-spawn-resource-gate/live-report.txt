@@ -1,9 +1,9 @@
-Host headroom now: available 51% (25067 of 49152 MB), swap used 7997 MB, load 4.32 on 18 cores (0.24 per core), pressure normal
-Verdict for one more worker: defer - available memory 25067 MB less 17734 MB reserved for running workers and this worker's expected 4800 MB leaves 2533 MB, below min_avail_pct=20 (9830 MB)
-Thresholds (/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf/config/host-headroom): min_avail_pct=20 max_swap_used_mb=16384 max_load_per_core=1.5 defer_pressure=critical default_worker_mb=4800
-Machine budget: 0 MB available above the 20% floor (9830 MB) after 17734 MB reserved for 4 running worker(s) to reach their expected footprint, shared by every project
-Workers running now with measured memory: 4 using 1466 MB
-Per-worker memory: no worker samples yet in /var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf/state/host-footprint.log; new workers are expected at default_worker_mb=4800 MB
-Largest safe concurrent worker count implied: 4 (4 running + 0 more at 4800 MB each, default_worker_mb, fewer than 3 measured workers)
-Project worktree pools (/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T//fm-lab.hMcowf/projects):
-  demo: pool cap 16; the machine budget (4 workers) binds first
+Host headroom now: available 77% (37847 of 49152 MB), swap used 5047 MB, load 2.93 on 18 cores (0.16 per core), pressure normal
+Verdict for one more worker: defer - available memory 37847 MB less 21528 MB reserved for running workers and this worker's expected 11206 MB leaves 5113 MB, below min_avail_pct=20 (9830 MB)
+Thresholds (/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.BQ5kuP/config/host-headroom): min_avail_pct=20 max_swap_used_mb=? max_load_per_core=? defer_pressure=critical default_worker_mb=11206
+Machine budget: 6489 MB available above the 20% floor (9830 MB) after 21528 MB reserved for 2 running worker(s) to reach their expected footprint, shared by every project
+Workers running now with measured memory: 2 using 884 MB
+Per-worker memory: no worker samples yet in /private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.BQ5kuP/state/host-footprint.log; new workers are expected at default_worker_mb=11206 MB
+Largest safe concurrent worker count implied: 2 (2 running + 0 more at 11206 MB each, default_worker_mb, fewer than 3 measured workers)
+Project worktree pools (/private/var/folders/6f/1jf88sjj1yb6bwg4qkrtlxd00000gn/T/fm-lab.BQ5kuP/projects):
+  demo: pool cap 16; the machine budget (2 workers) binds first

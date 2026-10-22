@@ -1,0 +1,4 @@
+# Round 3: lab home, no test seam, real sysctl on this Mac (48 GB). sysctl kern.memorystatus_level=77
+$ fm-host-headroom.sh check --kind ship --harness claude
+ok: available 77% (37847 of 49152 MB), swap used 5047 MB, load 2.56 on 18 cores (0.14 per core), pressure normal; expected worker 1536 MB (default_worker_mb, fewer than 3 measured workers of kind ship); 0 running worker(s) reserve 0 MB
+exit 0
